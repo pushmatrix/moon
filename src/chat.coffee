@@ -21,10 +21,7 @@ class window.Chat
 		date = new Date()
 		li.innerText = li.textContent = "#{date.getHours()}:#{date.getMinutes()}:#{date.getSeconds()} - #{message}"
 		document.getElementById('chat-log').appendChild(li)
-
-		setTimeout ->
-			li.parentNode.removeChild li
-		, 20000
+		li.scrollIntoView()
 
 	keyDown: (e) =>
 		e.stopPropagation()
