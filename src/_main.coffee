@@ -42,11 +42,13 @@ class window.Milk
 		Milk.loadingStates[className] += 1
 
 		console.log 'LOADING', className
+		l.append("<li>Loading #{className}</li>") if l = $('#chat-log')
 
 	ready: ->
 		className = @constructor.name
 		Milk.loadingStates[className] -= 1
 		console.log 'DONE', className
+		l.append("<li>Done #{className}</li>") if l = $('#chat-log')
 
 		game.ready() if @isReady()
 
@@ -77,6 +79,7 @@ class Milk.Game extends Milk
 
 	ready: ->
 		console.log 'DONE LOADING GAME'
+		setTimeout (-> $('#chat-log').html('')), 1500
 		@stage()
 		@start()
 
