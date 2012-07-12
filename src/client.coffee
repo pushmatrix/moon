@@ -4,7 +4,7 @@ class Client
     now.addPlayers = (players) =>
       for id of players
         player = players[id]
-        @game.addPlayer(id, player.position, @id() == id)
+        @game.addPlayer(id, player.position, @id() == id, player.items)
         console.log "CREATING #{id}"
         console.log "I AM #{@id()}"
 
@@ -15,6 +15,12 @@ class Client
         @game.players[id] = null
         delete @game.players[id]
 
+    now.updateInventory = (data) =>
+      player = @game.players[data.id]
+      if data.equipped
+        player.equipItem(data.item)
+      else
+        player.unequipItem(data.item)
 
     now.updatePlayer = (data) =>
       return if data.id == @id()
@@ -34,9 +40,14 @@ class Client
 
   sendUpdate: ->
     player = @game.player
+    return unless player
     now.sendUpdate
       position: player.position
       voicePitch: player.voicePitch
+      items: Object.keys(game.player.items)
 
   sendMessage: (message) ->
     now.sendMessage message
+
+  sendEquipUpdate: (item, equipped) ->
+    now.sendEquipUpdate item, equipped

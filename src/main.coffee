@@ -1,7 +1,6 @@
 clock = new THREE.Clock()
 publicUrl = "/public/"
 
-
 class window.Key
   @KEYS: {
     'up': 38
@@ -167,8 +166,8 @@ class Scene
   remove: (object) ->
     @scene.remove object
 
-  addPlayer: (id, position = new THREE.Vector3(7,12,-70), currentPlayer = false) ->
-    p = new Player(position)
+  addPlayer: (id, position = new THREE.Vector3(7,12,-70), currentPlayer = false, items) ->
+    p = new Player(position, items)
     @players[id] = p
     @add(p)
     if currentPlayer
@@ -226,5 +225,6 @@ $(document).ready ->
   client = new Client game
 
   window.chat = new Chat
+  window.inventory = new Inventory
   window.game = game
   window.client = client

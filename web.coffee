@@ -51,3 +51,6 @@ everyone.now.sendUpdate = (player) ->
 
 everyone.now.sendMessage = (message) ->
   everyone.now.receiveMessage {id: @user.clientId, message: message}
+
+everyone.now.sendEquipUpdate = (item, equipped) ->
+  everyone.now.updateInventory {id: @user.clientId, item: item, equipped: equipped}

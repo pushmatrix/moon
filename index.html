@@ -41,7 +41,47 @@
     #chat-log:hover {
       opacity: 0.9;
     }
+
     #chat-log li {
+      cursor: pointer;
+    }
+
+    #inventory {
+      width: 268px;
+      height: 63px;
+      position: absolute;
+      bottom: 100%;
+      padding: 0;
+      display: none;
+      top: 0;
+      padding: 3px;
+      right:0;
+      -webkit-transition: opacity 0.4s; /* Safari and Chrome */
+    }
+
+    #inventory li {
+      display: block;
+      width: 60px;
+      height: 60px;
+      border: 1px solid darkgrey;
+      float: left;
+      background: grey;
+      margin: 0 5px 5px 0;
+    }
+
+    #inventory li img {
+      position:relative;
+      width: 40px;
+      height: 40px;
+      top: 50%;
+      left: 50%;
+      margin-top:-25px;
+      margin-left:-25px;
+      padding-right: 10px;
+    }
+
+    #inventory li:hover {
+      opacity: 0.5;
       cursor: pointer;
     }
   </style>
@@ -78,6 +118,13 @@
 </head>
 
 <body>
+  <ul id="inventory">
+    <li><img data-item="milk" src="/public/milk.png"/></li>
+    <li><img data-item="cookies" src="/public/cookies.png"/></li>
+    <li><img data-item="hat" src="/public/hat.png"/></li>
+    <li><img data-item="dino" src="/public/dino.png"/></li>
+    <li><img data-item="helmet" src="/public/helmet.png"/></li>
+  </ul>
   <div id="audio"></div>
   <ul id="chat-log"></ul>
   <input id="chat" type="text" />

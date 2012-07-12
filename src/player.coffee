@@ -1,5 +1,25 @@
 class Player extends THREE.Object3D
-  constructor: (position) ->
+
+  ITEM_OPTIONS =
+    dino: 'mask'
+    helmet: 'mask'
+    hat: 'hat'
+    milk: 'hand'
+    cookies: 'hand'
+
+  ITEM_OFFSETS =
+    mask: 
+      x: 0
+      y: 0.6
+    hand: 
+      x: 0.45
+      y: 0
+    hat:
+      x: 0
+      y: 0.9
+
+
+  constructor: (position, startingItems = []) ->
     super()
     @position = position
 
@@ -14,15 +34,18 @@ class Player extends THREE.Object3D
     @useQuaternion = true
 
     @jumping = false
+    @scaleFactor = 0.0001
+
+    @items = {}
 
     # Did you know you can do texture animation with UV offsets?
-    @texture = THREE.ImageUtils.loadTexture "/public/robot.png"
-    @sprite= new THREE.Sprite( { map: @texture, useScreenCoordinates: false, color: 0xffffff } );
-    this.sprite.scale.y = 0.02
-    this.sprite.scale.x = 0.015
+    @sprite = new Sprite("robot.png")
     @add(@sprite)
 
     @voicePitch = Math.random()*100
+
+    for item in startingItems
+      @equipItem(item)
 
   direction: ->
     c_orient_axis = new THREE.Vector3();
@@ -47,6 +70,21 @@ class Player extends THREE.Object3D
       @angularVelocity = @maxTurnSpeed
     else if @angularVelocity < -@maxTurnSpeed
       @angularVelocity = - @maxTurnSpeed
+
+  equipItem: (item) ->
+    unless @items[item]
+      itemSprite = new Sprite("#{item}.png")
+      slot = ITEM_OPTIONS[item] || "hand"
+      offset = ITEM_OFFSETS[slot]
+      itemSprite.position.set(offset.x, offset.y, 0.1)
+      @add(itemSprite)
+      @items[item] = itemSprite
+ 
+  unequipItem: (item) ->
+    if @items[item]
+      @remove @items[item]
+      @items[item] = null
+      delete @items[item]
 
   update: (timestep) ->
     rotation = new THREE.Quaternion()
