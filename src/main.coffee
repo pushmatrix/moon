@@ -81,8 +81,8 @@ class Scene
     @add(@moon)
 
     ## SKYBOX
-    urls = 
-      [ 
+    urls =
+      [
         "#{publicUrl}/posx.png" #pos-x
         "#{publicUrl}/negx.png" #neg-x
         "#{publicUrl}/posy.png" #pos-y
@@ -207,11 +207,13 @@ class Scene
     @pointLight.position = @player.position.clone()
     @pointLight.position.y += 10
 
-
     if @player.position.y < (@milk.position.y - 3)
       @scene.fog.far = 20
     else
       @scene.fog.far = 100000
+
+    for _,player of @players
+      player.updateChildren(_)
 
     @earth.rotation.y += 0.01
     @earth.rotation.z += 0.005

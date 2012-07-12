@@ -56,6 +56,15 @@ class Player extends THREE.Object3D
     @position.y += @yVelocity
     @yVelocity -= 0.0005
 
+  updateChildren: ->
+    if mesh = @textMesh
+      mesh.position.x = @position.x
+      mesh.position.y = @position.y + 1.1
+      mesh.position.z = @position.z
+
+      mesh.lookAt game.camera.position
+      mesh.translateX -mesh.width
+
   TEXT_OPTIONS = {
     size: 32
     height: 6
@@ -87,12 +96,12 @@ class Player extends THREE.Object3D
 
     @textMesh = mesh = new THREE.Mesh geo, faceMaterial
     mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.01
-    mesh.position.x = -geo.boundingBox.max.x / 150
-    mesh.position.y = 1.1
-    @add mesh
+    mesh.width = geo.boundingBox.max.x * mesh.scale.x / 2
+
+    game.add mesh
 
     @clearMessageTimeout = setTimeout (=> @clearMessage()), Math.max(message.length * 200, 1000)
 
   clearMessage: ->
     clearTimeout @clearMessageTimeout if @clearMessageTimeout
-    @remove @textMesh
+    game.remove @textMesh
