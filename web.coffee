@@ -12,14 +12,21 @@ app.get '/', (req,res) ->
 
 players = {}
 nowjs.on 'connect', ->
+  # Send all the existing players to the new player
+  @now.addPlayers(players)
+
+  player = {}
   players[this.user.clientId] = {}
-  everyone.now.addPlayer(@user.clientId)
+
+  # Send this new player to all existing players
+  _player = {}
+  _player["#{this.user.clientId}"] = player
+  everyone.now.addPlayers(_player)
+
 
 nowjs.on 'disconnect', ->
-  for i in players
-    if i == this.user.clientId
-      delete players[i]
-      break
+  everyone.now.removePlayer(this.user.clientId)
+  delete players[this.user.clientId]
 
 #everyoneButUser = (user, callback) =>
 #  for i of players
@@ -30,6 +37,7 @@ nowjs.on 'disconnect', ->
 
 everyone.now.sendUpdate = (player) ->
   players[this.user.clientId] = player
+
   everyone.now.updatePlayer
     id: @user.clientId
     position: player.position

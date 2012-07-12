@@ -1,6 +1,7 @@
 class Player extends THREE.Object3D
-  constructor: (@position) ->
+  constructor: (position) ->
     super()
+    @position = position
 
     @velocity = 0
     @yVelocity = 0
