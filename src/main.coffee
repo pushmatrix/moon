@@ -207,7 +207,7 @@ class Scene
       @player.position.y = mapHeightAtPlayer + magicNumber
       @player.jumping = false
 
-    target = @player.position.clone().subSelf(@player.direction().multiplyScalar(-8))
+    target = @player.position.clone().subSelf(@player.direction().multiplyScalar(-@player.followDistance))
     @camera.position = @camera.position.addSelf(target.subSelf(@camera.position).multiplyScalar(0.1))
 
     mapHeightAtCamera = @moon.getHeight(@camera.position.x, @camera.position.z)

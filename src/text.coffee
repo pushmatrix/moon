@@ -1,15 +1,15 @@
 class window.TextObject extends THREE.Object3D
   @TEXT_OPTIONS = {
-    size: 32
-    height: 6
+    size: 42
+    height: 64
     curveSegments: 4
     font: "helvetiker"
     weight: "normal"
     style: "normal"
     bevelEnabled: true
-    bevelThickness: 0.25
-    bevelSize: 0.25
-    bend: false
+    bevelThickness: 1
+    bevelSize: 1
+    bend: true
     material: 0
     extrudeMaterial: 1
   }
@@ -27,7 +27,7 @@ class window.TextObject extends THREE.Object3D
     geo.computeVertexNormals()
 
     @mesh = mesh = new THREE.Mesh geo, @faceMaterial
-    mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.01
+    mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.015
 
     @width = geo.boundingBox.max.x * mesh.scale.x / 2
     @add mesh

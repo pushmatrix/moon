@@ -18,6 +18,8 @@ class Player extends THREE.Object3D
       x: 0
       y: 0.9
 
+  followDistance: 8
+
   constructor: (id, position, startingItems = []) ->
     super()
     @playerId = id

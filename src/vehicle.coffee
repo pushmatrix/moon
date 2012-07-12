@@ -1,6 +1,7 @@
 class window.Vehicle extends Player
 	enterTextShown: false
 	hasEntered: false
+	followDistance: 12
 
 	canEnter: ->
 		(!@hasEntered) and game.player.position.distanceToSquared(@position) < 75
