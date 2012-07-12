@@ -102,14 +102,6 @@ class Scene
     @milk.position.y = 5
     @add(@milk)
 
-    x = new Player(new THREE.Vector3(1,100,0))
-    x.position.y = 8
-    x.position.z = 0
-    x.position.x = 0
-    @add(x)
-
-    window.x = x
-
     ## EARTH
     @earth = new THREE.Mesh(new THREE.SphereGeometry(50,20,20), new THREE.MeshLambertMaterial(map: THREE.ImageUtils.loadTexture("/public/earth.jpg"), color: 0x0))
     @earth.position.z= 500
