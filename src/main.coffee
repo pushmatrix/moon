@@ -62,6 +62,7 @@ class Scene
       'space': -> @player.jump 1
       'enter': -> chat.showWindow()
       'e': -> @enterVehicle()
+      'escape': -> @exitVehicle()
     }
 
     @scene = new THREE.Scene
@@ -182,9 +183,19 @@ class Scene
   enterVehicle: ->
     for vehicle in @vehicles
       if vehicle.canEnter()
+        vehicle.player = @player
         @players[@player.playerId] = vehicle
         @player = vehicle.enter @player
         return
+
+  exitVehicle: ->
+    return if @player.playerId
+    window.tardis = @player
+    vehicle = @player
+    vehicle.exit vehicle.player
+
+    @player = vehicle.player
+    @players[@player.playerId] = @player
 
 # Uncomment for .obj loading capabilities
 # THREE.Mesh.loader = new THREE.JSONLoader()

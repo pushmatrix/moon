@@ -7,15 +7,18 @@ class window.Vehicle extends Player
 		(!@hasEntered) and game.player.position.distanceToSquared(@position) < 75
 
 	enter: (player) ->
-		audio = document.createElement 'audio'
-		source = document.createElement 'source'
-		source.src = '/public/doctorwho.mp3'
-		audio.appendChild source
-		source = document.createElement 'source'
-		source.src = '/public/doctorwho.ogg'
-		audio.appendChild source
-		audio.autoplay = true
-		document.body.appendChild audio
+		if not @backgroundAudio
+			@backgroundAudio = audio = document.createElement 'audio'
+			source = document.createElement 'source'
+			source.src = '/public/doctorwho.mp3'
+			audio.appendChild source
+			source = document.createElement 'source'
+			source.src = '/public/doctorwho.ogg'
+			audio.appendChild source
+			audio.autoplay = true
+			document.body.appendChild audio
+		else
+			@backgroundAudio.play()
 
 		game.remove @enterText
 		@hasEntered = true
@@ -25,6 +28,18 @@ class window.Vehicle extends Player
 		@add player
 
 		return this
+
+	exit: (player) ->
+		@hasEntered = false
+		@backgroundAudio.pause()
+
+		@remove player
+		player.position.x = @position.x + 5
+		player.position.y = @position.y
+		player.position.z = @position.z + 5
+		game.add player
+
+		console.log @position.y
 
 	jump: ->
 		if not @wooshAudio
