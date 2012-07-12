@@ -17,9 +17,11 @@ class window.Chat
 		client.sendMessage @input.value
 
 	receiveMessage: (message) ->
-		li = document.createElement 'li'
 		date = new Date()
+		li = document.createElement 'li'
 		li.innerText = li.textContent = "#{date.getHours()}:#{date.getMinutes()}:#{date.getSeconds()} - #{message}"
+		li.addEventListener 'click', (-> speak.play message), false
+
 		document.getElementById('chat-log').appendChild(li)
 		li.scrollIntoView()
 
