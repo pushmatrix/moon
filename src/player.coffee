@@ -84,8 +84,7 @@ class Player extends THREE.Object3D
 
   displayMessage: (message) ->
     @clearMessage() if @textMesh
-
-    speak.play message, pitch: @voicePitch
+    speak.play message, pitch: @voicePitch, @clearMessage
 
     faceMaterial = new THREE.MeshFaceMaterial
     frontMaterial = new THREE.MeshBasicMaterial color: 0xffffff, shading: THREE.FlatShading
@@ -102,8 +101,6 @@ class Player extends THREE.Object3D
 
     game.add mesh
 
-    @clearMessageTimeout = setTimeout (=> @clearMessage()), Math.max(message.length * 200, 1000)
 
-  clearMessage: ->
-    clearTimeout @clearMessageTimeout if @clearMessageTimeout
+  clearMessage: =>
     game.remove @textMesh

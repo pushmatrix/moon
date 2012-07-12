@@ -13,14 +13,16 @@ class window.Chat
 		@input.style.display = 'none'
 
 	sendMessage: ->
-		game.player.displayMessage @input.value
 		client.sendMessage @input.value
 
-	receiveMessage: (message) ->
+	receiveMessage: (data) ->
+		callback = -> game.players[data.id].displayMessage data.message
+		callback()
+
 		date = new Date()
 		li = document.createElement 'li'
-		li.innerText = li.textContent = "#{date.getHours()}:#{date.getMinutes()}:#{date.getSeconds()} - #{message}"
-		li.addEventListener 'click', (-> speak.play message), false
+		li.innerText = li.textContent = "#{date.getHours()}:#{date.getMinutes()}:#{date.getSeconds()} - #{data.message}"
+		li.addEventListener 'click', callback, false
 
 		document.getElementById('chat-log').appendChild(li)
 		li.scrollIntoView()
