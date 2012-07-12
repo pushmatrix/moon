@@ -115,6 +115,13 @@ class Scene
     @milk.position.y = 5
     @add(@milk)
 
+    ## TARDIS
+    geometry = new THREE.CubeGeometry(3, 5, 3)
+    material = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture("/public/tardisFront.jpg")})
+    @tardis = new THREE.Mesh(geometry, material)
+    @tardis.position = new THREE.Vector3(25,9,-60)
+    @add(@tardis)
+
     ## EARTH
     @earth = new THREE.Mesh(new THREE.SphereGeometry(50,20,20), new THREE.MeshLambertMaterial(map: THREE.ImageUtils.loadTexture("/public/earth.jpg"), color: 0xeeeeee))
     @earth.position.z= 500
