@@ -16,18 +16,16 @@ class Client
         delete @game.players[id]
 
 
-    now.updatePlayer = (player) =>
-      return if player.id == @id()
-      if @game.players[player.id]
-        @game.players[player.id].position.x = player.position.x
-        @game.players[player.id].position.y = player.position.y
-        @game.players[player.id].position.z = player.position.z
+    now.updatePlayer = (data) =>
+      return if data.id == @id()
+      if player = @game.players[data.id]
+        player.position.x = data.position.x
+        player.position.y = data.position.y
+        player.position.z = data.position.z
+        player.voicePitch = data.voicePitch
 
     now.receiveMessage = (data) =>
-      chat.receiveMessage data.message
-      return if data.id is @id()
-      if player = @game.players[data.id]
-        player.displayMessage data.message
+      chat.receiveMessage data
 
     setInterval @sendUpdate, 33
 
@@ -35,8 +33,10 @@ class Client
     now.core.clientId
 
   sendUpdate: ->
+    player = @game.player
     now.sendUpdate
-      position: @game.player.position
+      position: player.position
+      voicePitch: player.voicePitch
 
   sendMessage: (message) ->
     now.sendMessage message

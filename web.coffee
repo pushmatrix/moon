@@ -36,11 +36,13 @@ nowjs.on 'disconnect', ->
 #        callback()
 
 everyone.now.sendUpdate = (player) ->
-  players[this.user.clientId] = player
+  players[@user.clientId] = player
 
-  everyone.now.updatePlayer
-    id: @user.clientId
-    position: player.position
+  data = JSON.parse JSON.stringify player
+  data.id = @user.clientId
+
+  everyone.now.updatePlayer data
+
   #clientId = @user.clientId
   #everyoneButUser @user, =>
   #  @now.updatePlayer

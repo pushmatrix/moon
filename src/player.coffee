@@ -22,6 +22,8 @@ class Player extends THREE.Object3D
     this.sprite.scale.x = 0.015
     @add(@sprite)
 
+    @voicePitch = Math.random()*100
+
   direction: ->
     c_orient_axis = new THREE.Vector3();
     @quaternion.multiplyVector3(new THREE.Vector3(0,0,1), c_orient_axis)
@@ -83,7 +85,7 @@ class Player extends THREE.Object3D
   displayMessage: (message) ->
     @clearMessage() if @textMesh
 
-    speak.play message
+    speak.play message, pitch: @voicePitch
 
     faceMaterial = new THREE.MeshFaceMaterial
     frontMaterial = new THREE.MeshBasicMaterial color: 0xffffff, shading: THREE.FlatShading
