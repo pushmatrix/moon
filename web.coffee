@@ -46,3 +46,6 @@ everyone.now.sendUpdate = (player) ->
   #  @now.updatePlayer
   #    id: clientId
   #    position: player.position
+
+everyone.now.sendMessage = (message) ->
+  everyone.now.receiveMessage {id: @user.clientId, message: message}

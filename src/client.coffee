@@ -14,7 +14,7 @@ class Client
         game.scene.remove(player)
         @game.players[id] = null
         delete @game.players[id]
-        
+
 
     now.updatePlayer = (player) =>
       return if player.id == @id()
@@ -22,7 +22,11 @@ class Client
         @game.players[player.id].position.x = player.position.x
         @game.players[player.id].position.y = player.position.y
         @game.players[player.id].position.z = player.position.z
-        window.player = @game.players[player.id]
+
+    now.receiveMessage = (data) =>
+      return if data.id is @id()
+      if player = @game.players[data.id]
+        player.displayMessage data.message
 
     setInterval @sendUpdate, 33
 
@@ -32,3 +36,6 @@ class Client
   sendUpdate: ->
     now.sendUpdate
       position: @game.player.position
+
+  sendMessage: (message) ->
+    now.sendMessage message

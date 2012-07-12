@@ -16,7 +16,7 @@ class Player extends THREE.Object3D
     @jumping = false
 
     # Did you know you can do texture animation with UV offsets?
-    @texture = THREE.ImageUtils.loadTexture "/public/robot.png" 
+    @texture = THREE.ImageUtils.loadTexture "/public/robot.png"
     @sprite= new THREE.Sprite( { map: @texture, useScreenCoordinates: false, color: 0xffffff } );
     this.sprite.scale.y = 0.02
     this.sprite.scale.x = 0.015
@@ -56,3 +56,5 @@ class Player extends THREE.Object3D
     @position.y += @yVelocity
     @yVelocity -= 0.0005
 
+  displayMessage: (message) ->
+    speak.play message

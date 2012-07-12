@@ -13,7 +13,8 @@ class window.Chat
 		@input.style.display = 'none'
 
 	sendMessage: ->
-		speak.play @input.value
+		game.player.displayMessage @input.value
+		client.sendMessage @input.value
 
 	keyDown: (e) =>
 		e.stopPropagation()

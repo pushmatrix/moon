@@ -199,3 +199,4 @@ $(document).ready ->
 
   window.chat = new Chat
   window.game = game
+  window.client = client
