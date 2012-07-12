@@ -76,7 +76,7 @@ class Player extends THREE.Object3D
       itemSprite = new Sprite("#{item}.png")
       slot = ITEM_OPTIONS[item] || "hand"
       offset = ITEM_OFFSETS[slot]
-      itemSprite.position.set(offset.x, offset.y, 0.1)
+      itemSprite.position.set(offset.x, offset.y, 0.001)
       @add(itemSprite)
       @items[item] = itemSprite
  
