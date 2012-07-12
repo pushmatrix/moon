@@ -12,6 +12,7 @@ app.get '/', (req,res) ->
 
 players = {}
 nowjs.on 'connect', ->
+  return
   # Send all the existing players to the new player
   @now.addPlayers(players)
 
@@ -25,6 +26,7 @@ nowjs.on 'connect', ->
 
 
 nowjs.on 'disconnect', ->
+  return
   everyone.now.removePlayer(this.user.clientId)
   delete players[this.user.clientId]
 

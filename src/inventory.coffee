@@ -1,3 +1,4 @@
+###
 class window.Inventory
   constructor: ->
     @elem = $("#inventory")
@@ -19,3 +20,4 @@ class window.Inventory
   keyDown: (e) =>
     if e.keyCode is 73
       @toggle()
+###

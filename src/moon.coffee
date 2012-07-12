@@ -1,3 +1,4 @@
+###
 class Moon extends THREE.Object3D
   constructor: ->
     super()
@@ -93,3 +94,4 @@ class Moon extends THREE.Object3D
       data[j++] = all / 30
 
     data
+###

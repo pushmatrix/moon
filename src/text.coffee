@@ -1,41 +1,50 @@
-class window.TextObject extends THREE.Object3D
-  @TEXT_OPTIONS = {
-    size: 42
-    height: 64
-    curveSegments: 4
-    font: "helvetiker"
-    weight: "normal"
-    style: "normal"
-    bevelEnabled: true
-    bevelThickness: 1
-    bevelSize: 1
-    bend: true
-    material: 0
-    extrudeMaterial: 1
-  }
+class Milk.Text extends Milk
+	DEFAULT_OPTIONS =
+		size: 42
+		height: 64
+		curveSegments: 4
+		font: "helvetiker"
+		weight: "normal"
+		style: "normal"
+		bevelEnabled: true
+		bevelThickness: 1
+		bevelSize: 1
+		bend: true
+		material: 0
+		extrudeMaterial: 1
 
-  constructor: (@message) ->
-    super()
+	constructor: (message = '', options = {}) ->
+		@message = message
+		@options = Milk.mixin {}, DEFAULT_OPTIONS, options
 
-    @faceMaterial = new THREE.MeshFaceMaterial
-    @frontMaterial = new THREE.MeshBasicMaterial color: 0xffffff, shading: THREE.FlatShading
-    @sideMaterial = new THREE.MeshBasicMaterial color: 0xbbbbbb, shading: THREE.SmoothShading
+		@faceMaterial = new THREE.MeshFaceMaterial
+		@frontMaterial = new THREE.MeshBasicMaterial color: 0xffffff, shading: THREE.FlatShading
+		@sideMaterial = new THREE.MeshBasicMaterial color: 0xbbbbbb, shading: THREE.SmoothShading
 
-    geo = new THREE.TextGeometry message, TextObject.TEXT_OPTIONS
-    geo.materials = [@frontMaterial, @sideMaterial]
-    geo.computeBoundingBox()
-    geo.computeVertexNormals()
+		@scale = 0.015
 
-    @mesh = mesh = new THREE.Mesh geo, @faceMaterial
-    mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.015
+	render: ->
+		geo = new THREE.TextGeometry @message, @options
+		geo.materials = [@frontMaterial, @sideMaterial]
+		geo.computeBoundingBox()
+		geo.computeVertexNormals()
 
-    @width = geo.boundingBox.max.x * mesh.scale.x / 2
-    @add mesh
+		@midX = geo.boundingBox.max.x * @scale / 2
 
-  positionOver: (object) ->
-    @position.x = object.position.x
-    @position.y = object.position.y + object.boundingBox.max.y + 0.5
-    @position.z = object.position.z
+		mesh = new THREE.Mesh geo, @faceMaterial
+		mesh.scale = new THREE.Vector3 @scale, @scale, @scale
+		@exportObject mesh
 
-    @lookAt game.camera.position
-    @translateX -@width
+	update: ->
+
+
+	positionOver: (object) ->
+		@position.x = object.position.x
+		@position.y = object.position.y + object.boundingBox.max.y + 0.5
+		@position.z = object.position.z
+
+		@lookAt game.camera.position
+		@translateX -@width
+
+class Milk.OverheadText
+

@@ -1,3 +1,4 @@
+###
 class window.Chat
 	constructor: ->
 		@input = document.getElementById('chat')
@@ -35,3 +36,4 @@ class window.Chat
 			@hideWindow()
 		else if e.keyCode is Key.KEYS.escape
 			@hideWindow()
+###

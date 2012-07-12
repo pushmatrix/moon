@@ -1,3 +1,4 @@
+###
 class Client
   now = window.now
   constructor: (@game) ->
@@ -51,3 +52,4 @@ class Client
 
   sendEquipUpdate: (item, equipped) ->
     now.sendEquipUpdate item, equipped
+###

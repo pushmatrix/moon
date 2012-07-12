@@ -1,3 +1,5 @@
+###
+
 class window.Vehicle extends Player
 	enterTextShown: false
 	hasEntered: false
@@ -80,3 +82,4 @@ class Vehicle.Tardis extends Vehicle
 		@boundingBox = geometry.boundingBox
 
 		@enterText = new TextObject 'press e to enter the tardis'
+###
