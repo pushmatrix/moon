@@ -1,0 +1,101 @@
+<html>
+  <head>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="/public/client.js"></script>
+    <script type="text/javascript" src="/public/mousetrap.js"></script>
+    <script type="text/javascript" src="/public/speak.js"></script>
+    <script src="/nowjs/now.js"></script>
+
+    <style>
+      input {
+        outline: none;
+        width: 100%;
+        height: 40px;
+        font-size: 30px;
+        top: 620px;
+        position: absolute;
+      }
+
+      body {
+        color: white;
+      }
+
+      #loading {
+        width: 100%;
+        margin: 0px auto;
+        text-align: center;
+        vertical-align: center;
+        position: absolute;
+        z-index: 0;
+        top: 325px;
+      }
+
+      canvas:focus {
+        outline: none;
+        z-index: 1000;
+      }
+
+      #main {
+        z-index: 1000;
+      }
+
+      #inventory {
+        width: 1024px;
+        height: 200px;
+        border: 1px solid white;
+        position: relative;
+        bottom: 100%;
+        background: grey;
+        margin: 0;
+        padding: 0;
+        opacity: 0;
+        -webkit-transition: opacity 0.4s; /* Safari and Chrome */
+      }
+
+      #inventory:hover {
+        opacity: 1;
+      }
+
+      #inventory li {
+        display: block;
+        width: 180px;
+        height: 180px;
+        border: 1px solid white;
+        float: left;
+        margin: 10 0 0 10;
+      }
+
+      #inventory li img {
+        position:relative;
+        top: 50%;
+        left: 50%;
+        margin-top:-25px;
+        margin-left:-25px;
+      }
+
+      #inventory li:hover {
+        opacity: 0.5;
+        cursor: pointer;
+      }
+    </style>
+
+  </head>
+
+  <body style="background: black">
+    <span>Milk Count: <span id="milkcount">0</span></span>
+    <div id="main"style="width: 1024px; height: 650px; margin: 0px auto; position: relative">
+      <canvas width="1024" height="650" tabindex=1></canvas>
+      <ul id="inventory">
+        <li><img data-item="milk" src="/public/milk.png"/></li>
+        <li><img data-item="cookies" src="/public/cookies.png"/></li>
+        <li><img data-item="hat" src="/public/hat.png"/></li>
+        <li><img data-item="helmet" src="/public/helmet.png"/></li>
+        <li><img data-item="dino" src="/public/dino.png"/></li>
+      </ul>
+      <input id="chat" type="text" />
+    </div>
+    <div id="loading">LOADING...</div>
+    <div id="audio"></div>
+  </body>
+
+</html>
