@@ -77,8 +77,8 @@ class Player extends THREE.Object3D
     speak.play message
 
     faceMaterial = new THREE.MeshFaceMaterial
-    frontMaterial = new THREE.MeshPhongMaterial color: 0xffffff, shading: THREE.FlatShading
-    sideMaterial = new THREE.MeshPhongMaterial color: 0xffffff, shading: THREE.SmoothShading
+    frontMaterial = new THREE.MeshBasicMaterial color: 0xffffff, shading: THREE.FlatShading
+    sideMaterial = new THREE.MeshBasicMaterial color: 0xbbbbbb, shading: THREE.SmoothShading
 
     geo = new THREE.TextGeometry message, TEXT_OPTIONS
     geo.materials = [frontMaterial, sideMaterial]
