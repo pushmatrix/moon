@@ -142,6 +142,8 @@ class Scene
 
   add: (object) ->
     @scene.add object
+  remove: (object) ->
+    @scene.remove object
 
   addPlayer: (id, position = new THREE.Vector3(7,15,7), currentPlayer = false) ->
     p = new Player(position)
