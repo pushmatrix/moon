@@ -6,8 +6,34 @@ class window.Milk
 
 		target
 
-	constructor: ->
+	constructor: (components...) ->
 		@scene = game.scene
+
+		for component in components
+			if component?.isMilkComponent
+				@components ||= []
+				@components.push component
+
+				for key, value of component.prototype
+					if not @[key]?
+						@[key] = value
+
+				component.call this
+
+	componentOperation: (operationName, args) ->
+		if @components
+			for component in @components
+				component::[operationName]?.apply this, args
+		null
+
+	stage: (args...) ->
+		@componentOperation 'stage', args
+
+	render: (args...) ->
+		@componentOperation 'render', args
+
+	update: (args...) ->
+		@componentOperation 'update', args
 
 	notReady: ->
 		className = @constructor.name
@@ -30,6 +56,15 @@ class window.Milk
 			return false if count > 0
 
 		true
+
+	exportObject: (@object3D) ->
+		@componentOperation 'exportObject', [object3D]
+
+	proxyToObject3D = (key) -> -> @object3D?[key]
+	position: proxyToObject3D 'position'
+
+class Milk.Component
+	@isMilkComponent: true
 
 class Milk.Game extends Milk
 	constructor: ->

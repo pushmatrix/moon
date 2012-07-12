@@ -5,17 +5,34 @@ class Milk.MoonLevel extends Milk.Level
 		@terrain = new Milk.MoonTerrain
 		@skybox = new Milk.Skybox "public/skybox"
 
+		@player = new Milk.Spaceman Milk.Controllable
+
 	stage: ->
 		super
 
 		@terrain.stage()
 		@skybox.stage()
 
-	update: ->
-		mapHeightAtCamera = @terrain.heightAtPosition @camera.position
-		# if mapHeightAtCamera > @player.position.y - 2
-		@camera.position.y = mapHeightAtCamera + 2
+		@player.stage()
 
+	update: ->
+		super
+
+		@player.update()
+
+		target = @player.object3D.position.clone().subSelf(@player.direction().multiplyScalar(-@player.followDistance))
+		@camera.position = @camera.position.addSelf(target.subSelf(@camera.position).multiplyScalar(0.1))
+
+		mapHeightAtCamera = @terrain.heightAtPosition @camera.position
+		if mapHeightAtCamera > @player.object3D.position.y - 2
+			@camera.position.y = mapHeightAtCamera + 2
+
+		@camera.lookAt @player.object3D.position
+		@pointLight.position = @player.object3D.position.clone()
+		@pointLight.position.y += 10
+
+	heightAtPosition: (position) ->
+		@terrain.heightAtPosition position
 
 class Milk.MoonTerrain extends Milk
 	constructor: ->
@@ -44,4 +61,4 @@ class Milk.MoonTerrain extends Milk
 		@scene.add @mesh
 
 	heightAtPosition: (position) ->
-		@heightMap.heightAtPosition position
+		@heightMap.heightAtPosition position.x, position.z

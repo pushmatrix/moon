@@ -1,10 +1,36 @@
 class Milk.Actor extends Milk
+	direction: ->
+		orient_axis = new THREE.Vector3
+		@object3D.quaternion.multiplyVector3 new THREE.Vector3(0,0,1), orient_axis
 
+		orient_axis
 
-class Milk.Spaceman extends Milk
-	render: ->
-		sprite = new Milk.Sprite "public/robot.png"
-		@scene.add sprite
+	forward: (direction) ->
+		@velocity += @speed * direction
+		if @velocity > @maxSpeed
+			@velocity = @maxSpeed
+		else if @velocity < -@maxSpeed
+			@velocity = -@maxSpeed
+
+	turn: (direction) ->
+		@angularVelocity += @turnSpeed * direction
+		if @angularVelocity > @maxTurnSpeed
+			@angularVelocity = @maxTurnSpeed
+		else if @angularVelocity < -@maxTurnSpeed
+			@angularVelocity = - @maxTurnSpeed
+
+class Milk.Spaceman extends Milk.Actor
+	constructor: ->
+		super
+		@sprite = new Milk.Sprite "public/robot.png", =>
+			@exportObject @sprite.object3D
+			@object3D.useQuaternion = true
+
+	followDistance: 8
+
+	stage: ->
+		super
+		@scene.add @sprite.object3D
 
 ###
 class Player extends THREE.Object3D
@@ -95,16 +121,6 @@ class Player extends THREE.Object3D
 			@remove @items[item]
 			@items[item] = null
 			delete @items[item]
-
-	update: (timestep) ->
-		rotation = new THREE.Quaternion()
-		rotation.setFromAxisAngle(new THREE.Vector3(0,1,0), @angularVelocity)
-		@quaternion.multiplySelf(rotation)
-		@angularVelocity *= 0.9
-		@velocity *= 0.8
-		@position.subSelf(@direction().multiplyScalar(@velocity))
-		@position.y += @yVelocity
-		@yVelocity -= 0.0005
 
 	afterUpdate: ->
 		@messageText?.positionOver this
