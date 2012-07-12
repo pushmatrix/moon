@@ -49,12 +49,9 @@ class Scene
       @container.appendChild @stats.domElement
 
     window.addEventListener 'resize', =>
-      w = window.innerWidth
-      h = window.innerHeight
-
-      @camera.aspect = w / h
-
-      @renderer.setSize w, h
+      @camera.aspect = window.innerWidth / window.innerHeight
+      @renderer.setSize( window.innerWidth, window.innerHeight )
+      @camera.updateProjectionMatrix()
 
   constructor: ->
     @handler = new Key window, {
@@ -119,7 +116,7 @@ class Scene
     geometry = new THREE.CubeGeometry(3, 5, 3)
     material = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture("/public/tardisFront.jpg")})
     @tardis = new THREE.Mesh(geometry, material)
-    @tardis.position = new THREE.Vector3(25,9,-60)
+    @tardis.position = new THREE.Vector3(-20,10.5,-60)
     @add(@tardis)
 
     ## EARTH
