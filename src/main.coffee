@@ -1,6 +1,7 @@
 clock = new THREE.Clock()
 publicUrl = "/public/"
 
+
 class Key
   @UP = 38
   @DOWN = 40
@@ -55,12 +56,10 @@ class Scene
     near = 1
     far = 100000
     @camera = new THREE.PerspectiveCamera fov, aspect, near, far
-    #@camera.useQuaternion = true
-
-    ## PLAYER
-    @player = new Player(new THREE.Vector3(0,0,0))
-    @add(@player)
     @scene.add(@camera)
+
+    ## PLAYERS
+    @players = {}
 
     ## MOON
     @moon = new Moon(128, 128, 127, 127)
@@ -77,6 +76,11 @@ class Scene
         "#{publicUrl}/stars.png" #neg-z
       ]
     skyTexture = THREE.ImageUtils.loadTextureCube(urls)
+    skyTexture.wrapS = THREE.RepeatWrapping;
+    skyTexture.wrapT = THREE.RepeatWrapping;
+    skyTexture.repeat.x = 100;
+    skyTexture.repeat.y = 100;
+
     skyShader = THREE.ShaderUtils.lib["cube"]
     skyShader.uniforms["tCube"].texture = skyTexture
     
@@ -98,6 +102,13 @@ class Scene
     @milk.position.y = 5
     @add(@milk)
 
+    x = new Player(new THREE.Vector3(1,100,0))
+    x.position.y = 8
+    x.position.z = 0
+    x.position.x = 0
+    @add(x)
+
+    window.x = x
 
     ## EARTH
     @earth = new THREE.Mesh(new THREE.SphereGeometry(50,20,20), new THREE.MeshLambertMaterial(map: THREE.ImageUtils.loadTexture("/public/earth.jpg"), color: 0x0))
@@ -118,15 +129,27 @@ class Scene
     @scene.fog = new THREE.Fog( 0xffffff, 1, 10000)
 
     @createRenderer()
-    requestAnimationFrame @render, @renderer.domElement
 
   add: (object) ->
     @scene.add object
+
+  addPlayer: (id, currentPlayer = false) ->
+    p = new Player(new THREE.Vector3(1,100,0))
+    p.position.y = 20
+    p.position.z = 5
+    p.position.x = 5
+    @players[id] = p
+    @add(p)
+    if currentPlayer
+      @player = p
+      requestAnimationFrame @render, @renderer.domElement
 
 # Uncomment for .obj loading capabilities
 # THREE.Mesh.loader = new THREE.JSONLoader()
 
   render: (time) =>
+    return unless @player
+
     delta = clock.getDelta()
     requestAnimationFrame @render, @renderer.domElement
     timestep = (time - @lastFrameTime) * 0.001
@@ -167,7 +190,9 @@ class Scene
     @earth.rotation.x += 0.005
     @renderer.render @scene, @camera
 
-window.onload = ->
+
+$(document).ready ->
   game = new Scene()
+  client = new Client(game)
   window.game = game
   window.key = Key
