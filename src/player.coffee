@@ -1,32 +1,8 @@
-class Milk.Actor extends Milk
-	direction: ->
-		orient_axis = new THREE.Vector3
-		@object3D.quaternion.multiplyVector3 new THREE.Vector3(0,0,1), orient_axis
-
-		orient_axis
-
-	forward: (direction) ->
-		@velocity += @speed * direction
-		if @velocity > @maxSpeed
-			@velocity = @maxSpeed
-		else if @velocity < -@maxSpeed
-			@velocity = -@maxSpeed
-
-	turn: (direction) ->
-		@angularVelocity += @turnSpeed * direction
-		if @angularVelocity > @maxTurnSpeed
-			@angularVelocity = @maxTurnSpeed
-		else if @angularVelocity < -@maxTurnSpeed
-			@angularVelocity = - @maxTurnSpeed
-
-class Milk.Spaceman extends Milk.Actor
+class Milk.Spaceman extends Milk
 	constructor: ->
 		super
 		@sprite = new Milk.Sprite "public/robot.png", =>
 			@exportObject @sprite.object3D
-			@object3D.useQuaternion = true
-
-	followDistance: 8
 
 	stage: ->
 		super

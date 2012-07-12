@@ -11,7 +11,6 @@ class Milk.KeyHandler extends Milk
 	}
 
 	@listen: ->
-		console.log 'listening'
 		return if @downListener
 		@pressed = {}
 		@downListener = window.addEventListener 'keydown', (e) => @pressed[e.keyCode] = true

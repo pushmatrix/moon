@@ -5,7 +5,11 @@ class Milk.MoonLevel extends Milk.Level
 		@terrain = new Milk.MoonTerrain
 		@skybox = new Milk.Skybox "public/skybox"
 
-		@player = new Milk.Spaceman Milk.Controllable
+		@player = new Milk.Spaceman(
+			Milk.Movable,
+			Milk.Controllable,
+			Milk.Jumpable
+		)
 
 	stage: ->
 		super
