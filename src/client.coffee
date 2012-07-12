@@ -24,6 +24,7 @@ class Client
         @game.players[player.id].position.z = player.position.z
 
     now.receiveMessage = (data) =>
+      chat.receiveMessage data.message
       return if data.id is @id()
       if player = @game.players[data.id]
         player.displayMessage data.message

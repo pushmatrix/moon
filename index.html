@@ -21,6 +21,20 @@
       height: 40px;
       font-size: 24pt;
     }
+    #chat-log {
+      position: absolute;
+      display: block;
+      left: 0;
+      bottom: 70px;
+      width: 250px;
+      height: 250px;
+      background-color: rgba(0,0,0,0.7);
+      color: #fff;
+      overflow: scroll;
+      font-family: "Helvetica";
+      font-size: 14pt;
+      padding: 5px;
+    }
   </style>
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
@@ -56,6 +70,7 @@
 
 <body>
   <div id="audio"></div>
+  <ul id="chat-log"></ul>
   <input id="chat" type="text" />
 </body>
 </html>

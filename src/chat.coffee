@@ -16,6 +16,16 @@ class window.Chat
 		game.player.displayMessage @input.value
 		client.sendMessage @input.value
 
+	receiveMessage: (message) ->
+		li = document.createElement 'li'
+		date = new Date()
+		li.innerText = li.textContent = "#{date.getHours()}:#{date.getMinutes()}:#{date.getSeconds()} - #{message}"
+		document.getElementById('chat-log').appendChild(li)
+
+		setTimeout ->
+			li.parentNode.removeChild li
+		, 20000
+
 	keyDown: (e) =>
 		e.stopPropagation()
 		if e.keyCode is Key.KEYS.enter
