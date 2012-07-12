@@ -25,6 +25,7 @@ nowjs.on 'connect', ->
 
 
 nowjs.on 'disconnect', ->
+  everyone.now.removePlayer(this.user.clientId)
   delete players[this.user.clientId]
 
 #everyoneButUser = (user, callback) =>

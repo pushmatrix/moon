@@ -8,6 +8,14 @@ class Client
         console.log "CREATING #{id}"
         console.log "I AM #{@id()}"
 
+    now.removePlayer = (id) =>
+      player = @game.players[id]
+      if player
+        game.scene.remove(player)
+        @game.players[id] = null
+        delete @game.players[id]
+        
+
     now.updatePlayer = (player) =>
       return if player.id == @id()
       if @game.players[player.id]
