@@ -1,4 +1,34 @@
-class window.Vehicle extends THREE.Object3D
+class window.Vehicle extends Player
+	enterTextShown: false
+	hasEntered: false
+
+	canEnter: ->
+		(!@hasEntered) and game.player.position.distanceToSquared(@position) < 75
+
+	enter: (player) ->
+		game.remove @enterText
+		@hasEntered = true
+
+		player.parent.remove player
+		player.position.x = player.position.y = player.position.z = 0
+		@add player
+
+		return this
+
+	update: (delta) ->
+		if @hasEntered
+			super
+
+		else if @canEnter()
+			if @enterTextShown
+				@enterText.positionOver this
+			else
+				@enterTextShown = true
+				game.add @enterText
+		else
+			if @enterTextShown
+				@enterTextShown = false
+				game.remove @enterText
 
 class Vehicle.Tardis extends Vehicle
 	constructor: ->
@@ -13,16 +43,3 @@ class Vehicle.Tardis extends Vehicle
 		@boundingBox = geometry.boundingBox
 
 		@enterText = new TextObject 'press e to enter the tardis'
-		@enterTextShown = false
-
-	update: ->
-		if game.player.position.distanceToSquared(@position) < 75
-			if @enterTextShown
-				@enterText.positionOver this
-			else
-				@enterTextShown = true
-				game.add @enterText
-		else
-			if @enterTextShown
-				@enterTextShown = false
-				game.remove @enterText

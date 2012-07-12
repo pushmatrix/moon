@@ -10,6 +10,7 @@ class window.Key
     'space': 32
     'enter': 13
     'escape': 27
+    'e': 69
   }
 
   constructor: (node, @map) ->
@@ -60,6 +61,7 @@ class Scene
       'right': -> @player.turn -1
       'space': -> @player.jump 1
       'enter': -> chat.showWindow()
+      'e': -> @enterVehicle()
     }
 
     @scene = new THREE.Scene
@@ -177,6 +179,12 @@ class Scene
     @scene.add object
     @vehicles.push object
 
+  enterVehicle: ->
+    for vehicle in @vehicles
+      if vehicle.canEnter()
+        @player = vehicle.enter @player
+        return
+
 # Uncomment for .obj loading capabilities
 # THREE.Mesh.loader = new THREE.JSONLoader()
 
@@ -193,8 +201,9 @@ class Scene
     @player.update(delta)
 
     mapHeightAtPlayer = @moon.getHeight(@player.position.x, @player.position.z)
-    if mapHeightAtPlayer > @player.position.y - 0.8
-      @player.position.y = mapHeightAtPlayer + 0.8
+    magicNumber = @player.boundingBox.max.y
+    if mapHeightAtPlayer > @player.position.y - magicNumber
+      @player.position.y = mapHeightAtPlayer + magicNumber
       @player.jumping = false
 
     target = @player.position.clone().subSelf(@player.direction().multiplyScalar(-8))
@@ -215,7 +224,7 @@ class Scene
       @scene.fog.far = 100000
 
     for vehicle in @vehicles
-      vehicle.update()
+      vehicle.update() if vehicle isnt @player
     for _,player of @players
       player.afterUpdate()
 

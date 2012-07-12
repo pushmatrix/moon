@@ -42,6 +42,8 @@ class Player extends THREE.Object3D
     @sprite = new Sprite("robot.png")
     @add(@sprite)
 
+    @boundingBox = {max: new THREE.Vector3(1, 0.8, 1)}
+
     @voicePitch = Math.random()*100
 
     for item in startingItems
