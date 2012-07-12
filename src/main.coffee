@@ -168,7 +168,7 @@ class Scene
     @scene.remove object
 
   addPlayer: (id, position = new THREE.Vector3(7,12,-70), currentPlayer = false, items) ->
-    p = new Player(position, items)
+    p = new Player(id, position, items)
     @players[id] = p
     @add(p)
     if currentPlayer
@@ -182,6 +182,7 @@ class Scene
   enterVehicle: ->
     for vehicle in @vehicles
       if vehicle.canEnter()
+        @players[@player.playerId] = vehicle
         @player = vehicle.enter @player
         return
 

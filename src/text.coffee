@@ -34,7 +34,7 @@ class window.TextObject extends THREE.Object3D
 
   positionOver: (object) ->
     @position.x = object.position.x
-    @position.y = object.position.y + object.boundingBox.max.y
+    @position.y = object.position.y + object.boundingBox.max.y + 0.5
     @position.z = object.position.z
 
     @lookAt game.camera.position

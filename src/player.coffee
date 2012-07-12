@@ -8,19 +8,19 @@ class Player extends THREE.Object3D
     cookies: 'hand'
 
   ITEM_OFFSETS =
-    mask: 
+    mask:
       x: 0
       y: 0.6
-    hand: 
+    hand:
       x: 0.45
       y: 0
     hat:
       x: 0
       y: 0.9
 
-
-  constructor: (position, startingItems = []) ->
+  constructor: (id, position, startingItems = []) ->
     super()
+    @playerId = id
     @position = position
 
     @velocity = 0
@@ -81,7 +81,7 @@ class Player extends THREE.Object3D
       itemSprite.position.set(offset.x, offset.y, 0.001)
       @add(itemSprite)
       @items[item] = itemSprite
- 
+
   unequipItem: (item) ->
     if @items[item]
       @remove @items[item]
@@ -99,14 +99,15 @@ class Player extends THREE.Object3D
     @yVelocity -= 0.0005
 
   afterUpdate: ->
-    @textObject?.positionOver this
+    @messageText?.positionOver this
 
   displayMessage: (message) ->
     @clearMessage() if @textMesh
     speak.play message, pitch: @voicePitch, @clearMessage
 
-    @textObject = new TextObject message
-    game.add @textObject
+    @messageText = new TextObject message
+    game.add @messageText
 
   clearMessage: =>
-    game.remove @textObject
+    game.remove @messageText
+    @messageText = null
