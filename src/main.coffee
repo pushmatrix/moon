@@ -2,26 +2,36 @@ clock = new THREE.Clock()
 publicUrl = "/public/"
 
 
-class Key
-  @UP = 38
-  @DOWN = 40
-  @LEFT = 37
-  @RIGHT = 39
-  @SPACE = 32
-  
-  window.addEventListener('keyup', ((event) => @onKeyup(event)), false)
-  window.addEventListener('keydown', ((event) => @onKeydown(event)), false)
-  
-  @_pressed: {}
-  
-  @isDown: (keyCode) ->
-    @_pressed[keyCode]
+class window.Key
+  @KEYS: {
+    'up': 38
+    'down': 40
+    'left': 37
+    'right': 39
+    'space': 32
+    'enter': 13
+    'escape': 27
+  }
 
-  @onKeydown: (event) ->
-    @_pressed[event.keyCode] = true
+  constructor: (node, @map) ->
+    @pressed = []
+    node.addEventListener 'keydown', @onKeyDown, false
+    node.addEventListener 'keyup', @onKeyUp, false
 
-  @onKeyup: (event) ->
-    delete @_pressed[event.keyCode]
+  update: (callContext) ->
+    for name, func of @map
+      keyCode = Key.KEYS[name]
+      func.call(callContext) if @isDown keyCode
+
+  isDown: (keyCode) ->
+    @pressed[keyCode]
+
+  onKeyDown: (event) =>
+    console.log event.keyCode if window.debugKeyCodes
+    @pressed[event.keyCode] = true
+
+  onKeyUp: (event) =>
+    @pressed[event.keyCode] = false unless @handlingKeys
 
 class Scene
   createRenderer: ->
@@ -47,6 +57,14 @@ class Scene
       @renderer.setSize w, h
 
   constructor: ->
+    @handler = new Key window, {
+      'up': -> @player.forward 1
+      'down': -> @player.forward -1
+      'left': -> @player.turn 1
+      'right': -> @player.turn -1
+      'space': -> @player.jump 1
+      'enter': -> chat.showWindow()
+    }
 
     @scene = new THREE.Scene
 
@@ -66,8 +84,8 @@ class Scene
     @add(@moon)
 
     ## SKYBOX
-    urls = 
-      [ 
+    urls =
+      [
         "#{publicUrl}/stars.png" #pos-x
         "#{publicUrl}/stars.png" #neg-x
         "#{publicUrl}/stars.png" #pos-y
@@ -83,13 +101,13 @@ class Scene
 
     skyShader = THREE.ShaderUtils.lib["cube"]
     skyShader.uniforms["tCube"].texture = skyTexture
-    
+
     skyMaterial = new THREE.ShaderMaterial
       uniforms: skyShader.uniforms
       vertexShader: skyShader.vertexShader
       fragmentShader: skyShader.fragmentShader
       depthWrite: false
-    
+
     @skybox = new THREE.Mesh(new THREE.CubeGeometry(10000, 10000, 10000, 1, 1, 1, null, true), skyMaterial)
     @skybox.flipSided = true
     @add(@skybox)
@@ -108,7 +126,7 @@ class Scene
     @earth.position.y= 79
     @earth.rotation.y = 2.54
     @add(@earth)
-    
+
 
     # LIGHTING
     @light = new THREE.PointLight 0xffffff
@@ -145,14 +163,9 @@ class Scene
     delta = clock.getDelta()
     requestAnimationFrame @render, @renderer.domElement
     timestep = (time - @lastFrameTime) * 0.001
-    
+
     @stats.update()
-    
-    if Key.isDown(Key.UP) then @player.forward(1)
-    if Key.isDown(Key.DOWN) then @player.forward(-1)
-    if Key.isDown(Key.LEFT) then @player.turn(1)
-    if Key.isDown(Key.RIGHT) then @player.turn(-1)
-    if Key.isDown(Key.SPACE) then @player.jump(1)
+    @handler.update(this)
 
     @player.update(delta)
 
@@ -184,7 +197,8 @@ class Scene
 
 
 $(document).ready ->
-  game = new Scene()
-  client = new Client(game)
+  game = new Scene
+  client = new Client game
+
+  window.chat = new Chat
   window.game = game
-  window.key = Key
