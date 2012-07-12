@@ -81,17 +81,12 @@ class Moon extends THREE.Object3D
 
     context.drawImage(img, 0, 0)
 
-    `for (var i = 0; i < size; ++i) {
-      data[i] = 0;
-    }`
-
     imgd = context.getImageData(0, 0, 128, 128)
     pix = imgd.data
 
     j = 0
-    `for (var i = 0, n = pix.length; i < n; i += (4)) {
-        var all = pix[i]+pix[i+1]+pix[i+2];
-        data[j++] = all/30;
-    }`
+    for pic, i in pix by 4
+      all = pic + pix[i + 1] + pix[i + 2]
+      data[j++] = all / 30
 
     data
