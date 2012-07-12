@@ -13,7 +13,8 @@ class window.Chat
 		@input.style.display = 'none'
 
 	sendMessage: ->
-		client.sendMessage @input.value
+		message = @input.value
+		client.sendMessage message if message
 
 	receiveMessage: (data) ->
 		callback = -> game.players[data.id].displayMessage data.message
