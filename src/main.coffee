@@ -62,7 +62,7 @@ class Scene
     @players = {}
 
     ## MOON
-    @moon = new Moon(128, 128, 127, 127)
+    @moon = new Moon()
     @add(@moon)
 
     ## SKYBOX
@@ -95,37 +95,61 @@ class Scene
     @add(@skybox)
 
     ## MILK
-    geometry = new THREE.PlaneGeometry(128, 128, 1, 1)
-    material = new THREE.MeshLambertMaterial( map: THREE.ImageUtils.loadTexture("/public/milk.jpg") )
+    geometry = new THREE.PlaneGeometry(256, 256, 1, 1)
+    material = new THREE.MeshPhongMaterial( ambient: 0xffffff, diffuse: 0xffffff, specular: 0xff9900, shininess: 64)
     @milk = new THREE.Mesh(geometry, material)
     @milk.doubleSided = true
     @milk.position.y = 5
     @add(@milk)
 
     ## EARTH
-    @earth = new THREE.Mesh(new THREE.SphereGeometry(50,20,20), new THREE.MeshLambertMaterial(map: THREE.ImageUtils.loadTexture("/public/earth.jpg"), color: 0x0))
+    @earth = new THREE.Mesh(new THREE.SphereGeometry(50,20,20), new THREE.MeshBasicMaterial(map: THREE.ImageUtils.loadTexture("/public/earth.jpg"), color: 0xffffff))
     @earth.position.z= 500
     @earth.position.y= 79
     @earth.rotation.y = 2.54
     @add(@earth)
-    
+
+
+    # SUN
+    textureFlare0 = THREE.ImageUtils.loadTexture( "/public/lensflare0.png" )
+    textureFlare2 = THREE.ImageUtils.loadTexture( "/public/lensflare2.png" )
+    textureFlare3 = THREE.ImageUtils.loadTexture( "/public/lensflare3.png" )
+
+    flareColor = new THREE.Color( 0xffffff )
+    THREE.ColorUtils.adjustHSV( flareColor, 0, -0.5, 0.5 )
+    @sun = new THREE.LensFlare( textureFlare0, 700, 0.0, THREE.AdditiveBlending, flareColor )
+    @sun.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending )
+    @sun.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending )
+    @sun.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending )
+
+    @sun.add( textureFlare3, 60, 0.6, THREE.AdditiveBlending )
+    @sun.add( textureFlare3, 70, 0.7, THREE.AdditiveBlending )
+    @sun.add( textureFlare3, 120, 0.9, THREE.AdditiveBlending )
+    @sun.add( textureFlare3, 70, 1.0, THREE.AdditiveBlending )
+    @sun.position.x = 0
+    @sun.position.y = 30
+    @sun.position.z = -500
+    @scene.add(@sun)
 
     # LIGHTING
-    @light = new THREE.PointLight 0xffffff
-    @ambient = new THREE.AmbientLight( 0x999999)
-    @light.position = @camera.position
-    @add(@light)
+    @pointLight = new THREE.PointLight(0x666666)
+    @sunlight = new THREE.DirectionalLight()
+
+    @sunlight.position.set(0, 50, -100).normalize()
+    @ambient = new THREE.AmbientLight( 0x222222)
+    @scene.add(@sunlight)
     @add(@ambient)
+    @add(@pointLight)
 
     # FOG
-    @scene.fog = new THREE.Fog( 0xffffff, 1, 10000)
+    @scene.fog = new THREE.Fog( 0x0, 1, 10000)
 
     @createRenderer()
 
   add: (object) ->
     @scene.add object
 
-  addPlayer: (id, position = new THREE.Vector3(7,15,7), currentPlayer = false) ->
+  addPlayer: (id, position = new THREE.Vector3(7,12,-70), currentPlayer = false) ->
     p = new Player(position)
     @players[id] = p
     @add(p)
@@ -167,12 +191,14 @@ class Scene
       @player.jumping = false
 
     @camera.lookAt(@player.position)
+    @pointLight.position = @player.position.clone()
+    @pointLight.position.y += 10
 
 
     if @player.position.y < (@milk.position.y - 3)
       @scene.fog.far = 20
     else
-      @scene.fog.far = 10000
+      @scene.fog.far = 100000
 
     @earth.rotation.y += 0.01
     @earth.rotation.z += 0.005

@@ -1,32 +1,35 @@
 class Moon extends THREE.Object3D
-  constructor: (@width, @height, @numRows, @numCols)->
+  constructor: ->
     super()
-
-    @cellWidth = (@numRows + 1) / @height
-    @cellHeight = (@numCols + 1) / @width
-    @geometry = new THREE.PlaneGeometry(@width, @height, @numRows, @numCols)
-    @geometry.dynamic = true
 
     img = new Image()
     img.onload = =>
+
+      @height = img.height
+      @width = img.width
+      @numRows = @height - 1
+      @numCols = @width - 1
+
+      @cellWidth = (@numRows + 1) / @height
+      @cellHeight = (@numCols + 1) / @width
+      @geometry = new THREE.PlaneGeometry(@width, @height, @numRows, @numCols)
+      @geometry.dynamic = true
+
       @heights = @getHeightData(img)
       for vertex in @geometry.vertices
         vertex.y = @heights[_i]
       @geometry.computeFaceNormals()
 
 
-      planeTex = THREE.ImageUtils.loadTexture("public/moon.jpeg")
+      planeTex = THREE.ImageUtils.loadTexture("public/dirt.jpg")
       planeTex.wrapS = planeTex.wrapT = THREE.RepeatWrapping
       planeTex.repeat.set( 10, 10 )
 
-      planeTex2 = THREE.ImageUtils.loadTexture("public/map.jpeg")
-
-      @material = new THREE.MeshLambertMaterial(map: planeTex, transparent: true, opacity: 0.5, shading: THREE.SmoothShading)
-      @material2 = new THREE.MeshLambertMaterial(map: planeTex2, transparent: true, opacity: 1, shading: THREE.SmoothShading)
-      @mesh = THREE.SceneUtils.createMultiMaterialObject(@geometry, [@material2, @material])
+      @material = new THREE.MeshLambertMaterial(map: planeTex, shading: THREE.SmoothShading, specular: 0x0)
+      @mesh = new THREE.Mesh(@geometry, @material)
       @add(@mesh)
 
-    img.src = 'public/map.jpeg'
+    img.src = 'public/map.jpg'
 
   getHeight: (x, z) ->
     return 0 unless @heights
@@ -72,16 +75,16 @@ class Moon extends THREE.Object3D
 
   getHeightData: (img) ->
     canvas = document.createElement('canvas')
-    canvas.width = 128
-    canvas.height = 128
+    canvas.width = img.width
+    canvas.height = img.height
     context = canvas.getContext('2d')
 
-    size = 128 * 128
+    size = img.width * img.height
     data = new Float32Array(size)
 
     context.drawImage(img, 0, 0)
 
-    imgd = context.getImageData(0, 0, 128, 128)
+    imgd = context.getImageData(0, 0, img.width, img.height)
     pix = imgd.data
 
     j = 0
