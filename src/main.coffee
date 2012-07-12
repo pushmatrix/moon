@@ -74,6 +74,7 @@ class Scene
 
     ## PLAYERS
     @players = {}
+    @vehicles = []
 
     ## MOON
     @moon = new Moon()
@@ -112,11 +113,9 @@ class Scene
     @add(@milk)
 
     ## TARDIS
-    geometry = new THREE.CubeGeometry(3, 5, 3)
-    material = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture("/public/tardisFront.jpg")})
-    @tardis = new THREE.Mesh(geometry, material)
-    @tardis.position = new THREE.Vector3(-20,10.5,-60)
-    @add(@tardis)
+    tardis = new Vehicle.Tardis
+    tardis.position = new THREE.Vector3(-20,10.5,-60)
+    @addVehicle tardis
 
     ## EARTH
     @earth = new THREE.Mesh(new THREE.SphereGeometry(50,20,20), new THREE.MeshLambertMaterial(map: THREE.ImageUtils.loadTexture("/public/earth.jpg"), color: 0xeeeeee))
@@ -174,6 +173,10 @@ class Scene
       @player = p
       requestAnimationFrame @render, @renderer.domElement
 
+  addVehicle: (object) ->
+    @scene.add object
+    @vehicles.push object
+
 # Uncomment for .obj loading capabilities
 # THREE.Mesh.loader = new THREE.JSONLoader()
 
@@ -211,8 +214,10 @@ class Scene
     else
       @scene.fog.far = 100000
 
+    for vehicle in @vehicles
+      vehicle.update()
     for _,player of @players
-      player.updateChildren(_)
+      player.afterUpdate()
 
     @earth.rotation.y += 0.01
     @earth.rotation.z += 0.005
@@ -221,10 +226,7 @@ class Scene
 
 
 $(document).ready ->
-  game = new Scene
-  client = new Client game
-
+  window.game = new Scene
+  window.client = new Client game
   window.chat = new Chat
   window.inventory = new Inventory
-  window.game = game
-  window.client = client

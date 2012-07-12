@@ -96,49 +96,15 @@ class Player extends THREE.Object3D
     @position.y += @yVelocity
     @yVelocity -= 0.0005
 
-  updateChildren: ->
-    if mesh = @textMesh
-      mesh.position.x = @position.x
-      mesh.position.y = @position.y + 1.1
-      mesh.position.z = @position.z
-
-      mesh.lookAt game.camera.position
-      mesh.translateX -mesh.width
-
-  TEXT_OPTIONS = {
-    size: 32
-    height: 6
-    curveSegments: 4
-    font: "helvetiker"
-    weight: "normal"
-    style: "normal"
-    bevelEnabled: true
-    bevelThickness: 0.25
-    bevelSize: 0.25
-    bend: false
-    material: 0
-    extrudeMaterial: 1
-  }
+  afterUpdate: ->
+    @textObject?.positionOver this
 
   displayMessage: (message) ->
     @clearMessage() if @textMesh
     speak.play message, pitch: @voicePitch, @clearMessage
 
-    faceMaterial = new THREE.MeshFaceMaterial
-    frontMaterial = new THREE.MeshBasicMaterial color: 0xffffff, shading: THREE.FlatShading
-    sideMaterial = new THREE.MeshBasicMaterial color: 0xbbbbbb, shading: THREE.SmoothShading
-
-    geo = new THREE.TextGeometry message, TEXT_OPTIONS
-    geo.materials = [frontMaterial, sideMaterial]
-    geo.computeBoundingBox()
-    geo.computeVertexNormals()
-
-    @textMesh = mesh = new THREE.Mesh geo, faceMaterial
-    mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.01
-    mesh.width = geo.boundingBox.max.x * mesh.scale.x / 2
-
-    game.add mesh
-
+    @textObject = new TextObject message
+    game.add @textObject
 
   clearMessage: =>
-    game.remove @textMesh
+    game.remove @textObject
