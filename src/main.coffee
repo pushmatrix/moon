@@ -125,11 +125,8 @@ class Scene
   add: (object) ->
     @scene.add object
 
-  addPlayer: (id, currentPlayer = false) ->
-    p = new Player(new THREE.Vector3(1,100,0))
-    p.position.y = 20
-    p.position.z = 5
-    p.position.x = 5
+  addPlayer: (id, position = new THREE.Vector3(7,15,7), currentPlayer = false) ->
+    p = new Player(position)
     @players[id] = p
     @add(p)
     if currentPlayer
