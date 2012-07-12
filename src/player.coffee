@@ -16,7 +16,7 @@ class Player extends THREE.Object3D
     @jumping = false
 
     # Did you know you can do texture animation with UV offsets?
-    @texture = THREE.ImageUtils.loadTexture "/public/robot.png" 
+    @texture = THREE.ImageUtils.loadTexture "/public/robot.png"
     @sprite= new THREE.Sprite( { map: @texture, useScreenCoordinates: false, color: 0xffffff } );
     this.sprite.scale.y = 0.02
     this.sprite.scale.x = 0.015
@@ -56,3 +56,43 @@ class Player extends THREE.Object3D
     @position.y += @yVelocity
     @yVelocity -= 0.0005
 
+  TEXT_OPTIONS = {
+    size: 32
+    height: 6
+    curveSegments: 4
+    font: "helvetiker"
+    weight: "normal"
+    style: "normal"
+    bevelEnabled: true
+    bevelThickness: 0.25
+    bevelSize: 0.25
+    bend: false
+    material: 0
+    extrudeMaterial: 1
+  }
+
+  displayMessage: (message) ->
+    @clearMessage() if @textMesh
+
+    speak.play message
+
+    faceMaterial = new THREE.MeshFaceMaterial
+    frontMaterial = new THREE.MeshPhongMaterial color: 0xffffff, shading: THREE.FlatShading
+    sideMaterial = new THREE.MeshPhongMaterial color: 0xffffff, shading: THREE.SmoothShading
+
+    geo = new THREE.TextGeometry message, TEXT_OPTIONS
+    geo.materials = [frontMaterial, sideMaterial]
+    geo.computeBoundingBox()
+    geo.computeVertexNormals()
+
+    @textMesh = mesh = new THREE.Mesh geo, faceMaterial
+    mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.01
+    mesh.position.x = -geo.boundingBox.max.x / 150
+    mesh.position.y = 1.1
+    @add mesh
+
+    @clearMessageTimeout = setTimeout (=> @clearMessage()), Math.max(message.length * 200, 1000)
+
+  clearMessage: ->
+    clearTimeout @clearMessageTimeout if @clearMessageTimeout
+    @remove @textMesh

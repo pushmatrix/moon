@@ -25,7 +25,7 @@ class Moon extends THREE.Object3D
       planeTex.wrapS = planeTex.wrapT = THREE.RepeatWrapping
       planeTex.repeat.set( 10, 10 )
 
-      @material = new THREE.MeshLambertMaterial(map: planeTex, shading: THREE.SmoothShading, specular: 0x0)
+      @material = new THREE.MeshLambertMaterial(map: planeTex, shading: THREE.SmoothShading, specular: 0x0, ambient: 0xeeeeee, diffuse: 0x0, color: 0x555555, shininess: 32)
       @mesh = new THREE.Mesh(@geometry, @material)
       @add(@mesh)
 

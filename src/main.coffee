@@ -2,26 +2,36 @@ clock = new THREE.Clock()
 publicUrl = "/public/"
 
 
-class Key
-  @UP = 38
-  @DOWN = 40
-  @LEFT = 37
-  @RIGHT = 39
-  @SPACE = 32
-  
-  window.addEventListener('keyup', ((event) => @onKeyup(event)), false)
-  window.addEventListener('keydown', ((event) => @onKeydown(event)), false)
-  
-  @_pressed: {}
-  
-  @isDown: (keyCode) ->
-    @_pressed[keyCode]
+class window.Key
+  @KEYS: {
+    'up': 38
+    'down': 40
+    'left': 37
+    'right': 39
+    'space': 32
+    'enter': 13
+    'escape': 27
+  }
 
-  @onKeydown: (event) ->
-    @_pressed[event.keyCode] = true
+  constructor: (node, @map) ->
+    @pressed = []
+    node.addEventListener 'keydown', @onKeyDown, false
+    node.addEventListener 'keyup', @onKeyUp, false
 
-  @onKeyup: (event) ->
-    delete @_pressed[event.keyCode]
+  update: (callContext) ->
+    for name, func of @map
+      keyCode = Key.KEYS[name]
+      func.call(callContext) if @isDown keyCode
+
+  isDown: (keyCode) ->
+    @pressed[keyCode]
+
+  onKeyDown: (event) =>
+    console.log event.keyCode if window.debugKeyCodes
+    @pressed[event.keyCode] = true
+
+  onKeyUp: (event) =>
+    @pressed[event.keyCode] = false unless @handlingKeys
 
 class Scene
   createRenderer: ->
@@ -47,6 +57,14 @@ class Scene
       @renderer.setSize w, h
 
   constructor: ->
+    @handler = new Key window, {
+      'up': -> @player.forward 1
+      'down': -> @player.forward -1
+      'left': -> @player.turn 1
+      'right': -> @player.turn -1
+      'space': -> @player.jump 1
+      'enter': -> chat.showWindow()
+    }
 
     @scene = new THREE.Scene
 
@@ -68,28 +86,23 @@ class Scene
     ## SKYBOX
     urls = 
       [ 
-        "#{publicUrl}/stars.png" #pos-x
-        "#{publicUrl}/stars.png" #neg-x
-        "#{publicUrl}/stars.png" #pos-y
-        "#{publicUrl}/stars.png" #neg-y
-        "#{publicUrl}/stars.png" #pos-z
-        "#{publicUrl}/stars.png" #neg-z
+        "#{publicUrl}/posx.png" #pos-x
+        "#{publicUrl}/negx.png" #neg-x
+        "#{publicUrl}/posy.png" #pos-y
+        "#{publicUrl}/negy.png" #neg-y
+        "#{publicUrl}/posz.png" #pos-z
+        "#{publicUrl}/negz.png" #neg-z
       ]
     skyTexture = THREE.ImageUtils.loadTextureCube(urls)
-    skyTexture.wrapS = THREE.RepeatWrapping;
-    skyTexture.wrapT = THREE.RepeatWrapping;
-    skyTexture.repeat.x = 100;
-    skyTexture.repeat.y = 100;
-
     skyShader = THREE.ShaderUtils.lib["cube"]
     skyShader.uniforms["tCube"].texture = skyTexture
-    
+
     skyMaterial = new THREE.ShaderMaterial
       uniforms: skyShader.uniforms
       vertexShader: skyShader.vertexShader
       fragmentShader: skyShader.fragmentShader
       depthWrite: false
-    
+
     @skybox = new THREE.Mesh(new THREE.CubeGeometry(10000, 10000, 10000, 1, 1, 1, null, true), skyMaterial)
     @skybox.flipSided = true
     @add(@skybox)
@@ -103,12 +116,11 @@ class Scene
     @add(@milk)
 
     ## EARTH
-    @earth = new THREE.Mesh(new THREE.SphereGeometry(50,20,20), new THREE.MeshBasicMaterial(map: THREE.ImageUtils.loadTexture("/public/earth.jpg"), color: 0xffffff))
+    @earth = new THREE.Mesh(new THREE.SphereGeometry(50,20,20), new THREE.MeshLambertMaterial(map: THREE.ImageUtils.loadTexture("/public/earth.jpg"), color: 0xeeeeee))
     @earth.position.z= 500
     @earth.position.y= 79
     @earth.rotation.y = 2.54
     @add(@earth)
-
 
     # SUN
     textureFlare0 = THREE.ImageUtils.loadTexture( "/public/lensflare0.png" )
@@ -148,6 +160,8 @@ class Scene
 
   add: (object) ->
     @scene.add object
+  remove: (object) ->
+    @scene.remove object
 
   addPlayer: (id, position = new THREE.Vector3(7,12,-70), currentPlayer = false) ->
     p = new Player(position)
@@ -166,14 +180,9 @@ class Scene
     delta = clock.getDelta()
     requestAnimationFrame @render, @renderer.domElement
     timestep = (time - @lastFrameTime) * 0.001
-    
+
     @stats.update()
-    
-    if Key.isDown(Key.UP) then @player.forward(1)
-    if Key.isDown(Key.DOWN) then @player.forward(-1)
-    if Key.isDown(Key.LEFT) then @player.turn(1)
-    if Key.isDown(Key.RIGHT) then @player.turn(-1)
-    if Key.isDown(Key.SPACE) then @player.jump(1)
+    @handler.update(this)
 
     @player.update(delta)
 
@@ -207,7 +216,9 @@ class Scene
 
 
 $(document).ready ->
-  game = new Scene()
-  client = new Client(game)
+  game = new Scene
+  client = new Client game
+
+  window.chat = new Chat
   window.game = game
-  window.key = Key
+  window.client = client
