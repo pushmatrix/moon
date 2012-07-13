@@ -28,14 +28,15 @@ class window.Milk
 
 	stage: (args...) ->
 		@componentOperation 'stage', args
-
 	render: (args...) ->
 		@componentOperation 'render', args
-
 	update: (args...) ->
 		@componentOperation 'update', args
 
 	notReady: ->
+		@_ready = false
+		return if game.hasLoaded
+
 		className = @constructor.name
 		Milk.loadingStates ||= {}
 		Milk.loadingStates[className] ||= 0
@@ -45,6 +46,10 @@ class window.Milk
 		l.append("<li>Loading #{className}</li>") if l = $('#chat-log')
 
 	ready: ->
+		@_ready = true
+		@onready?()
+		return if game.hasLoaded
+
 		className = @constructor.name
 		Milk.loadingStates[className] -= 1
 		console.log 'DONE', className
@@ -59,11 +64,12 @@ class window.Milk
 
 		true
 
+	afterReady: (callback) ->
+		@onready = callback
+		@onready?() if @_ready
+
 	exportObject: (@object3D) ->
 		@componentOperation 'exportObject', [object3D]
-
-	proxyToObject3D = (key) -> -> @object3D?[key]
-	position: proxyToObject3D 'position'
 
 class Milk.Component
 	@isMilkComponent: true
@@ -74,10 +80,13 @@ class Milk.Game extends Milk
 		@isReady = false
 
 	loadLevel: (levelClass) ->
+		@client = new Milk.NetworkClient
 		@level = new levelClass
+
 		@isReady = true #this will prevent any synchronous notReady calls from firing ready
 
 	ready: ->
+		@hasLoaded = true
 		console.log 'DONE LOADING GAME'
 		setTimeout (-> $('#chat-log').html('')), 1500
 		@stage()

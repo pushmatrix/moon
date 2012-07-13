@@ -1,12 +1,68 @@
 class Milk.Spaceman extends Milk
 	constructor: ->
 		super
+		@notReady()
 		@sprite = new Milk.Sprite "public/robot.png", =>
 			@exportObject @sprite.object3D
+			@ready()
 
 	stage: ->
 		super
-		@scene.add @sprite.object3D
+		@scene.add @object3D
+
+class Milk.Movable extends Milk.Component
+	constructor: ->
+		@velocity = 0
+		@yVelocity = 0
+		@speed = 0.05
+		@maxSpeed = 0.2
+
+		@angularVelocity = 0
+		@turnSpeed = 0.01
+		@maxTurnSpeed = 0.02
+
+	exportObject: ->
+		@object3D.useQuaternion = true
+
+	forward: (direction) ->
+		@velocity += @speed * direction
+		if @velocity > @maxSpeed
+			@velocity = @maxSpeed
+		else if @velocity < -@maxSpeed
+			@velocity = -@maxSpeed
+
+	turn: (direction) ->
+		@angularVelocity += @turnSpeed * direction
+		if @angularVelocity > @maxTurnSpeed
+			@angularVelocity = @maxTurnSpeed
+		else if @angularVelocity < -@maxTurnSpeed
+			@angularVelocity = - @maxTurnSpeed
+
+	update: ->
+		rotation = new THREE.Quaternion()
+		rotation.setFromAxisAngle(new THREE.Vector3(0,1,0), @angularVelocity)
+		@object3D.quaternion.multiplySelf(rotation)
+
+		@angularVelocity *= 0.9
+		@velocity *= 0.8
+		@object3D.position.subSelf(@direction().multiplyScalar(@velocity))
+		@object3D.position.y += @yVelocity
+		@yVelocity -= 0.0005
+
+		mapHeightAtPlayer = game.level.heightAtPosition @object3D.position
+		magicNumber = 0.8#@player.boundingBox.max.y
+		if mapHeightAtPlayer > @object3D.position.y - magicNumber
+			@object3D.position.y = mapHeightAtPlayer + magicNumber
+			@jumping = false
+
+	updateNetwork: ->
+		now.sendPlayerUpdate
+			position: @object3D.position
+
+	direction: ->
+		orient_axis = new THREE.Vector3
+		@object3D.quaternion.multiplyVector3 new THREE.Vector3(0,0,1), orient_axis
+		orient_axis
 
 ###
 class Player extends THREE.Object3D

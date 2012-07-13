@@ -2,14 +2,21 @@ class Milk.MoonLevel extends Milk.Level
 	constructor: ->
 		super bootstrap: true
 
+
 		@terrain = new Milk.MoonTerrain
 		@skybox = new Milk.Skybox "public/skybox"
 
+		@players = {}
 		@player = new Milk.Spaceman(
-			Milk.Movable,
-			Milk.Controllable,
+			Milk.Movable
+			Milk.Controllable
 			Milk.Jumpable
+			Milk.Network
 		)
+
+		game.client.observe 'addPlayer', @addPlayer
+		game.client.observe 'removePlayer', @removePlayer
+		game.client.observe 'receivePlayerUpdate', @receivePlayerUpdate
 
 	stage: ->
 		super
@@ -23,7 +30,10 @@ class Milk.MoonLevel extends Milk.Level
 		super
 
 		@player.update()
+		for id, player of @players
+			player.update()
 
+		# CAMERA
 		target = @player.object3D.position.clone().subSelf(@player.direction().multiplyScalar(-@player.followDistance))
 		@camera.position = @camera.position.addSelf(target.subSelf(@camera.position).multiplyScalar(0.1))
 
@@ -37,6 +47,29 @@ class Milk.MoonLevel extends Milk.Level
 
 	heightAtPosition: (position) ->
 		@terrain.heightAtPosition position
+
+	addPlayer: (data) =>
+		player = new Milk.Spaceman Milk.Movable
+		player.afterReady =>
+			@players[''+data.id] = player
+
+			player.stage()
+			@receivePlayerUpdate data
+
+	removePlayer: (data) =>
+		player = @players[''+data.id]
+		@scene.remove player.object3D
+
+		@players[''+data.id] = null
+		delete @players[''+data.id]
+
+	receivePlayerUpdate: (data) =>
+		player = @players[''+data.id]
+
+		if data.position
+			player.object3D.position.x = data.position.x
+			player.object3D.position.y = data.position.y
+			player.object3D.position.z = data.position.z
 
 class Milk.MoonTerrain extends Milk
 	constructor: ->

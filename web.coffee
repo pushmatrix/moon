@@ -12,31 +12,33 @@ app.get '/', (req,res) ->
 
 players = {}
 nowjs.on 'connect', ->
-  return
   # Send all the existing players to the new player
-  @now.addPlayers(players)
 
-  player = {}
-  players[this.user.clientId] = {}
+  @now.welcome
+    players: players
+
+  id = @user.clientId
+  player = players[''+id] = {id: id}
 
   # Send this new player to all existing players
-  _player = {}
-  _player["#{this.user.clientId}"] = player
-  everyone.now.addPlayers(_player)
+  everyone.now.addPlayer player
 
 
 nowjs.on 'disconnect', ->
-  return
-  everyone.now.removePlayer(this.user.clientId)
-  delete players[this.user.clientId]
+  id = @user.clientId
+  players[''+id] = null
+  delete players[''+id]
 
-#everyoneButUser = (user, callback) =>
-#  for i of players
-#    if i != user.clientId
-#      console.log "sending from #{user.clientId} to #{i}"
-#      nowjs.getClient i, (err) =>
-#        callback()
+  everyone.now.removePlayer {id: id}
 
+everyone.now.sendPlayerUpdate = (data) ->
+  player = players[@user.clientId]
+  for key, value of data
+    player[key] = value
+
+  everyone.now.receivePlayerUpdate player
+
+###
 everyone.now.sendUpdate = (player) ->
   players[@user.clientId] = player
 
@@ -56,3 +58,5 @@ everyone.now.sendMessage = (message) ->
 
 everyone.now.sendEquipUpdate = (item, equipped) ->
   everyone.now.updateInventory {id: @user.clientId, item: item, equipped: equipped}
+
+###
