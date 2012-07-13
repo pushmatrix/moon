@@ -1,3 +1,5 @@
+window.disableEnvironment = true
+
 class window.Milk
 	@mixin: (target, objects...) ->
 		for object in objects
@@ -23,18 +25,21 @@ class window.Milk
 
 				component.call this
 
-	componentOperation: (operationName, args) ->
+	componentDispatch: (operationName, args) ->
 		if @components
 			for component in @components
 				component::[operationName]?.apply this, args
 		null
 
 	stage: (args...) ->
-		@componentOperation 'stage', args
+		@componentDispatch 'stage', args
 	render: (args...) ->
-		@componentOperation 'render', args
+		@componentDispatch 'render', args
 	update: (args...) ->
-		@componentOperation 'update', args
+		@componentDispatch 'update', args
+	exportObject: (object3D) ->
+		@object3D = object3D
+		@componentDispatch 'exportObject', [object3D]
 
 	notReady: ->
 		@_ready = false
@@ -70,9 +75,6 @@ class window.Milk
 	afterReady: (callback) ->
 		@onready = callback
 		@onready?() if @_ready
-
-	exportObject: (@object3D) ->
-		@componentOperation 'exportObject', [object3D]
 
 	observe: (eventName, callback) ->
 		@_observers ||= {}

@@ -18,7 +18,7 @@ nowjs.on 'connect', ->
     players: players
 
   id = @user.clientId
-  player = players[''+id] = {id: id}
+  player = players[id] = {id: id}
 
   # Send this new player to all existing players
   everyone.now.addPlayer player
@@ -26,13 +26,14 @@ nowjs.on 'connect', ->
 
 nowjs.on 'disconnect', ->
   id = @user.clientId
-  players[''+id] = null
-  delete players[''+id]
+  players[id] = null
+  delete players[id]
 
   everyone.now.removePlayer {id: id}
 
 everyone.now.sendPlayerUpdate = (data) ->
   player = players[@user.clientId]
+  return if not player
   for key, value of data
     player[key] = value
 

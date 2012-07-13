@@ -8,6 +8,12 @@ class Milk.Actor extends Milk
 		super
 		@object3D.update? delta
 
+	updateNetwork: (data) ->
+		@componentDispatch 'updateNetwork', [data]
+
+	receiveNetworkUpdate: (data) ->
+		@componentDispatch 'receiveNetworkUpdate', [data]
+
 class Milk.Alien extends Milk.Actor
 	constructor: ->
 		super
@@ -64,7 +70,18 @@ class Milk.Animation extends Milk.Component
 		return if @currentAnimation is name
 		@character?.animationFPS = fps
 		@character?.setAnimation? name
+
 		@currentAnimation = name
+		@currentFPS = fps
+
+	updateNetwork: (data) ->
+		data.animation =
+			name: @currentAnimation || 'stand'
+			fps: @currentFPS
+
+	receiveNetworkUpdate: (data) ->
+		if data.animation
+			@setAnimation data.animation.name, data.animation.fps
 
 class Milk.Movable extends Milk.Component
 	constructor: ->
@@ -118,9 +135,22 @@ class Milk.Movable extends Milk.Component
 				@jumping = false
 				@setAnimation?('stand')
 
-	updateNetwork: ->
-		now.sendPlayerUpdate
-			position: @object3D.position
+	updateNetwork: (data) ->
+		data.position = @object3D.position
+		data.quaternion = @object3D.quaternion
+
+	receiveNetworkUpdate: (data) ->
+		if data.position
+			@yVelocity = 0
+			@object3D.position.x = data.position.x
+			@object3D.position.y = data.position.y
+			@object3D.position.z = data.position.z
+
+		if data.quaternion
+			@object3D.quaternion.x = data.quaternion.x
+			@object3D.quaternion.y = data.quaternion.y
+			@object3D.quaternion.z = data.quaternion.z
+			@object3D.quaternion.w = data.quaternion.w
 
 	direction: ->
 		orient_axis = new THREE.Vector3
@@ -148,59 +178,14 @@ class Player extends THREE.Object3D
 			x: 0
 			y: 0.9
 
-	followDistance: 8
-
 	constructor: (id, position, startingItems = []) ->
-		super()
-		@playerId = id
-		@position = position
-
-		@velocity = 0
-		@yVelocity = 0
-		@speed = 0.05
-		@maxSpeed = 0.2
-
-		@angularVelocity = 0
-		@turnSpeed = 0.01
-		@maxTurnSpeed = 0.02
-		@useQuaternion = true
-
-		@jumping = false
-		@scaleFactor = 0.0001
-
 		@items = {}
 
 
 		@boundingBox = {max: new THREE.Vector3(1, 0.8, 1)}
 
-		@voicePitch = Math.random()*100
-
 		for item in startingItems
 			@equipItem(item)
-
-	direction: ->
-		c_orient_axis = new THREE.Vector3();
-		@quaternion.multiplyVector3(new THREE.Vector3(0,0,1), c_orient_axis)
-		c_orient_axis
-
-	forward: (direction) ->
-		@velocity += @speed * direction
-		if @velocity > @maxSpeed
-			@velocity = @maxSpeed
-		else if @velocity < -@maxSpeed
-			@velocity = -@maxSpeed
-
-	jump: (direction) ->
-		if !@jumping
-			@yVelocity = @speed
-			@jumping = true
-
-	turn: (direction) ->
-		@angularVelocity += @turnSpeed * direction
-		if @angularVelocity > @maxTurnSpeed
-			@angularVelocity = @maxTurnSpeed
-		else if @angularVelocity < -@maxTurnSpeed
-			@angularVelocity = - @maxTurnSpeed
 
 	equipItem: (item) ->
 		unless @items[item]
@@ -217,17 +202,4 @@ class Player extends THREE.Object3D
 			@items[item] = null
 			delete @items[item]
 
-	afterUpdate: ->
-		@messageText?.positionOver this
-
-	displayMessage: (message) ->
-		@clearMessage() if @textMesh
-		speak.play message, pitch: @voicePitch, @clearMessage
-
-		@messageText = new TextObject message
-		game.add @messageText
-
-	clearMessage: =>
-		game.remove @messageText
-		@messageText = null
 ###

@@ -1,4 +1,6 @@
 class Milk.NetworkClient extends Milk
+	@UPDATE_INTERVAL = 30
+
 	constructor: ->
 		super
 		@players = {}
@@ -23,7 +25,10 @@ class Milk.NetworkClient extends Milk
 
 		now.receivePlayerUpdate = (data) =>
 			return if data.id is @id()
+
 			player = @players[data.id]
+			return if not player
+
 			for key, value of data
 				player[key] = value
 
@@ -35,65 +40,40 @@ class Milk.NetworkClient extends Milk
 
 	id: -> now.core.clientId
 
-class Milk.Network extends Milk.Component
-	UPDATE_INTERVAL = 30
+	enablePlayerUpdates: ->
+		@playerUpdateInterval = setInterval =>
+			return if not now.sendPlayerUpdate
+			data = {}
+			@fire 'willSendPlayerUpdate', data
 
-	queueUpdate: ->
-		return if @networkUpdateTimer
-		@networkUpdateTimer = setTimeout (=> @networkUpdateTimer = null; @updateNetwork()), UPDATE_INTERVAL
+			now.sendPlayerUpdate data if not data.cancel
+		, Milk.NetworkClient.UPDATE_INTERVAL
+
+	disablePlayerUpdates: ->
+		return if not @playerUpdateInterval
+		clearInterval @playerUpdateInterval
+		@playerUpdateInterval = null
 
 ###
 class Client
-  now = window.now
-  constructor: (@game) ->
-    now.addPlayers = (players) =>
-      for id of players
-        player = players[id]
-        @game.addPlayer(id, player.position, @id() == id, player.items)
-        console.log "CREATING #{id}"
-        console.log "I AM #{@id()}"
+	now = window.now
+	constructor: (@game) ->
 
-    now.removePlayer = (id) =>
-      player = @game.players[id]
-      if player
-        game.scene.remove(player)
-        @game.players[id] = null
-        delete @game.players[id]
+		now.updateInventory = (data) =>
+			player = @game.players[data.id]
+			if data.equipped
+				player.equipItem(data.item)
+			else
+				player.unequipItem(data.item)
 
-    now.updateInventory = (data) =>
-      player = @game.players[data.id]
-      if data.equipped
-        player.equipItem(data.item)
-      else
-        player.unequipItem(data.item)
+	sendUpdate: ->
+		player = @game.player
+		return unless player
+		now.sendUpdate
+			position: player.position
+			voicePitch: player.voicePitch
+			items: Object.keys(game.player.items)
 
-    now.updatePlayer = (data) =>
-      return if data.id == @id()
-      if player = @game.players[data.id]
-        player.position.x = data.position.x
-        player.position.y = data.position.y
-        player.position.z = data.position.z
-        player.voicePitch = data.voicePitch
-
-    now.receiveMessage = (data) =>
-      chat.receiveMessage data
-
-    setInterval @sendUpdate, 33
-
-  id: ->
-    now.core.clientId
-
-  sendUpdate: ->
-    player = @game.player
-    return unless player
-    now.sendUpdate
-      position: player.position
-      voicePitch: player.voicePitch
-      items: Object.keys(game.player.items)
-
-  sendMessage: (message) ->
-    now.sendMessage message
-
-  sendEquipUpdate: (item, equipped) ->
-    now.sendEquipUpdate item, equipped
+	sendEquipUpdate: (item, equipped) ->
+		now.sendEquipUpdate item, equipped
 ###
