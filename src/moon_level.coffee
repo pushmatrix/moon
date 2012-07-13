@@ -2,15 +2,14 @@ class Milk.MoonLevel extends Milk.Level
 	constructor: ->
 		super bootstrap: true
 
-
 		@terrain = new Milk.MoonTerrain
 		@skybox = new Milk.Skybox "public/skybox"
 
 		@players = {}
-		@player = new Milk.Spaceman(
+		@player = new Milk.Alien(
+			Milk.Animation
 			Milk.Movable
 			Milk.Controllable
-			Milk.Jumpable
 			Milk.Network
 		)
 
@@ -26,12 +25,12 @@ class Milk.MoonLevel extends Milk.Level
 
 		@player.stage()
 
-	update: ->
+	update: (delta) ->
 		super
 
-		@player.update()
+		@player.update delta
 		for id, player of @players
-			player.update()
+			player.update delta
 
 		# CAMERA
 		target = @player.object3D.position.clone().subSelf(@player.direction().multiplyScalar(-@player.followDistance))

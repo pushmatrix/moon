@@ -1,3 +1,47 @@
+class Milk.Alien extends Milk
+	constructor: ->
+		super
+		@notReady()
+
+		options = {
+			baseUrl: "public/ratamahatta/"
+			body: "ratamahatta.js"
+			skins: [ "ratamahatta.png", "ctf_b.png", "ctf_r.png", "dead.png", "gearwhore.png" ]
+			weapons: [  [ "weapon.js", "weapon.png" ],
+								 [ "w_bfg.js", "w_bfg.png" ],
+								 [ "w_blaster.js", "w_blaster.png" ],
+								 [ "w_chaingun.js", "w_chaingun.png" ],
+								 [ "w_glauncher.js", "w_glauncher.png" ],
+								 [ "w_hyperblaster.js", "w_hyperblaster.png" ],
+								 [ "w_machinegun.js", "w_machinegun.png" ],
+								 [ "w_railgun.js", "w_railgun.png" ],
+								 [ "w_rlauncher.js", "w_rlauncher.png" ],
+								 [ "w_shotgun.js", "w_shotgun.png" ],
+								 [ "w_sshotgun.js", "w_sshotgun.png" ]
+							 ]
+		}
+
+		@character = new THREE.MD2Character
+		@character.scale = 0.08
+		@character.onLoadComplete = =>
+			@character.meshBody.rotation.y = 1.5
+			@exportObject @character.root
+
+			@ready()
+		@character.loadParts options
+
+	maxSpeed: 1.3
+	followDistance: 9
+	groundCollisionMinimum: 2
+
+	stage: ->
+		super
+		@scene.add @object3D
+
+	update: (delta) ->
+		super
+		@character.update delta
+
 class Milk.Spaceman extends Milk
 	constructor: ->
 		super
@@ -6,9 +50,19 @@ class Milk.Spaceman extends Milk
 			@exportObject @sprite.object3D
 			@ready()
 
+	followDistance: 8
+	groundCollisionMinimum: 0.8
+
 	stage: ->
 		super
 		@scene.add @object3D
+
+class Milk.Animation extends Milk.Component
+	setAnimation: (name, fps=6) ->
+		return if @currentAnimation is name
+		@character?.animationFPS = fps
+		@character?.setAnimation? name
+		@currentAnimation = name
 
 class Milk.Movable extends Milk.Component
 	constructor: ->
@@ -38,6 +92,11 @@ class Milk.Movable extends Milk.Component
 		else if @angularVelocity < -@maxTurnSpeed
 			@angularVelocity = - @maxTurnSpeed
 
+	jump: ->
+		if not @jumping
+			@yVelocity = @speed
+			@jumping = true
+
 	update: ->
 		rotation = new THREE.Quaternion()
 		rotation.setFromAxisAngle(new THREE.Vector3(0,1,0), @angularVelocity)
@@ -50,10 +109,12 @@ class Milk.Movable extends Milk.Component
 		@yVelocity -= 0.0005
 
 		mapHeightAtPlayer = game.level.heightAtPosition @object3D.position
-		magicNumber = 0.8#@player.boundingBox.max.y
+		magicNumber = @groundCollisionMinimum
 		if mapHeightAtPlayer > @object3D.position.y - magicNumber
 			@object3D.position.y = mapHeightAtPlayer + magicNumber
-			@jumping = false
+			if @jumping
+				@jumping = false
+				@setAnimation?('stand')
 
 	updateNetwork: ->
 		now.sendPlayerUpdate

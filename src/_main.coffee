@@ -137,9 +137,9 @@ class Milk.Game extends Milk
 		requestAnimationFrame @render, @renderer.domElement
 		timestep = (time - @lastFrameTime) * 0.001
 
-		@stats?.update()
+		@stats?.update delta
 
-		@level.update()
+		@level.update delta
 		@level.render @renderer
 
 $ ->

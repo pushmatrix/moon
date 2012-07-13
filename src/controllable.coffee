@@ -1,18 +1,20 @@
 class Milk.Controllable extends Milk.Component
-	constructor: ->
-		@followDistance = 8
-
 	exportObject: ->
 		Milk.KeyHandler.listen()
 
 	update: ->
 		if Milk.KeyHandler.isDown 'up'
+			@setAnimation?('run') if not @jumping
 			@forward?(1)
 			@queueUpdate?()
 
-		if Milk.KeyHandler.isDown 'down'
+		else if Milk.KeyHandler.isDown 'down'
+			@setAnimation?('run') if not @jumping
 			@forward?(-1)
 			@queueUpdate?()
+
+		else if @currentAnimation is 'run'
+			@setAnimation?('stand')
 
 		if Milk.KeyHandler.isDown 'left'
 			@turn?(1)
@@ -22,18 +24,10 @@ class Milk.Controllable extends Milk.Component
 			@turn?(-1)
 			@queueUpdate?()
 
-class Milk.Jumpable extends Milk.Component
-	exportObject: ->
-		Milk.KeyHandler.listen()
-
-	update: ->
 		if Milk.KeyHandler.isDown 'space'
-			@jump()
-			@queueUpdate?()
+			if not @preventJump
+				@setAnimation?('jump', 1)
+				@jump()
+				@queueUpdate?()
 		else if @jumping
 			@queueUpdate?()
-
-	jump: ->
-		if not @jumping
-			@yVelocity = @speed
-			@jumping = true
