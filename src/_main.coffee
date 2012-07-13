@@ -71,6 +71,19 @@ class window.Milk
 	exportObject: (@object3D) ->
 		@componentOperation 'exportObject', [object3D]
 
+	observe: (eventName, callback) ->
+		@_observers ||= {}
+		c = @_observers[eventName] ||= []
+		c.push callback if c.indexOf(callback) is -1
+		return this
+
+	fire: (eventName, data) ->
+		c = @_observers[eventName]
+		if c
+			for callback in c
+				callback data
+		return this
+
 class Milk.Component
 	@isMilkComponent: true
 

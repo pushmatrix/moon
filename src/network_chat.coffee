@@ -25,10 +25,14 @@ class Milk.NetworkChat extends Milk
 
 	sendMessage: ->
 		message = @input.value
-		now.sendMessage message: message if message
+		data = {message: message}
+		@fire 'willSendMessage', data
+
+		now.sendMessage data if message
 
 	receiveMessage: (data) =>
 		return if not data.message
+		@fire 'receiveMessage', data
 
 		date = new Date()
 		ul = document.getElementById 'chat-log'
@@ -36,7 +40,7 @@ class Milk.NetworkChat extends Milk
 		li = document.createElement 'li'
 		li.innerText = li.textContent = "#{date.getHours()}:#{date.getMinutes()}:#{date.getSeconds()} - #{data.message}"
 		li.style.cursor = 'pointer'
-		li.addEventListener 'click', (-> game.level.receiveMessage(data)), false
+		li.addEventListener 'click', (=> @fire 'receiveMessage', data), false
 		ul.appendChild li
 
 		li = document.createElement 'li'

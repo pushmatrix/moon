@@ -19,7 +19,11 @@ class Milk.MoonLevel extends Milk.Level
 		game.client.observe 'receivePlayerUpdate', @receivePlayerUpdate
 
 		@chat = new Milk.NetworkChat
-		game.client.observe 'receiveMessage', @receiveMessage
+		@chat.observe 'receiveMessage', @receiveMessage
+		@chat.observe 'willSendMessage', (data) =>
+			data.voice = @player.voice
+
+		@player.voice = {pitch: Math.random() * 100}
 
 	stage: ->
 		super
@@ -83,6 +87,7 @@ class Milk.MoonLevel extends Milk.Level
 		return if not message = data.message
 
 		player = if data.self then @player else @players[data.id]
+		player.voice = data.voice if data.voice
 		player.setText(message)
 		player.stageText()
 
@@ -96,7 +101,7 @@ class Milk.MoonLevel extends Milk.Level
 			currentPlayer.speechTimeout = setTimeout (-> currentPlayer.clearText(currentMessage)), 1000
 
 		@currentSpeech = {player: player, message: message}
-		speak.play message, {}, =>
+		speak.play message, player.voice || {}, =>
 			@currentSpeech = null
 			player.clearText(message)
 

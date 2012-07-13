@@ -2,7 +2,6 @@ class Milk.NetworkClient extends Milk
 	constructor: ->
 		super
 		@players = {}
-		@callbacks = {}
 
 		now.welcome = (data) =>
 			console.log 'MY ID IS', @id()
@@ -35,17 +34,6 @@ class Milk.NetworkClient extends Milk
 			@fire 'receiveMessage', data
 
 	id: -> now.core.clientId
-
-	observe: (eventName, callback) ->
-		c = @callbacks[eventName] ||= []
-		c.push callback if c.indexOf(callback) is -1
-
-	fire: (eventName, data) ->
-		c = @callbacks[eventName]
-		if c
-			for callback in c
-				callback data
-		return this
 
 class Milk.Network extends Milk.Component
 	UPDATE_INTERVAL = 30
