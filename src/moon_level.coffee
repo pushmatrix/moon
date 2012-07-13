@@ -2,9 +2,46 @@ class Milk.MoonLevel extends Milk.Level
 	constructor: ->
 		super bootstrap: true
 
+		## ENVIRONMENT
 		@terrain = new Milk.MoonTerrain
 		@skybox = new Milk.Skybox "public/skybox"
 
+		## MILK
+		geometry = new THREE.PlaneGeometry 256, 256, 1, 1
+		material = new THREE.MeshPhongMaterial ambient: 0xffffff, diffuse: 0xffffff, specular: 0xff9900, shininess: 64
+		@milk = new THREE.Mesh geometry, material
+		@milk.doubleSided = true
+		@milk.position.y = 5
+
+		## EARTH
+		@notReady()
+		geometry = new THREE.SphereGeometry 50, 20, 20
+		texture = new THREE.ImageUtils.loadTexture "/public/earth.jpg", null, => @ready()
+		material = new THREE.MeshLambertMaterial map: texture, color: 0xeeeeee
+		@earth = new THREE.Mesh geometry, material
+		@earth.position.y = 79
+		@earth.position.z = 500
+
+		## SUN
+		@notReady(); textureFlare0 = THREE.ImageUtils.loadTexture "/public/lensflare0.png", null, => @ready()
+		@notReady(); textureFlare2 = THREE.ImageUtils.loadTexture "/public/lensflare2.png", null, => @ready()
+		@notReady(); textureFlare3 = THREE.ImageUtils.loadTexture "/public/lensflare3.png", null, => @ready()
+
+		flareColor = new THREE.Color 0xffffff
+		THREE.ColorUtils.adjustHSV flareColor, 0, -0.5, 0.5
+
+		@sun = new THREE.LensFlare textureFlare0, 700, 0.0, THREE.AdditiveBlending, flareColor
+		@sun.add textureFlare2, 512, 0.0, THREE.AdditiveBlending
+		@sun.add textureFlare2, 512, 0.0, THREE.AdditiveBlending
+		@sun.add textureFlare2, 512, 0.0, THREE.AdditiveBlending
+		@sun.add textureFlare3, 60, 0.6, THREE.AdditiveBlending
+		@sun.add textureFlare3, 70, 0.7, THREE.AdditiveBlending
+		@sun.add textureFlare3, 120, 0.9, THREE.AdditiveBlending
+		@sun.add textureFlare3, 70, 1.0, THREE.AdditiveBlending
+		@sun.position.y = 30
+		@sun.position.z = -500
+
+		## PLAYERS
 		@players = {}
 		@player = new Milk.Alien(
 			Milk.OverheadText
@@ -14,10 +51,12 @@ class Milk.MoonLevel extends Milk.Level
 			Milk.Network
 		)
 
+		## NETWORK
 		game.client.observe 'addPlayer', @addPlayer
 		game.client.observe 'removePlayer', @removePlayer
 		game.client.observe 'receivePlayerUpdate', @receivePlayerUpdate
 
+		## NETWORK CHAT
 		@chat = new Milk.NetworkChat
 		@chat.observe 'receiveMessage', @receiveMessage
 		@chat.observe 'willSendMessage', (data) =>
@@ -31,13 +70,15 @@ class Milk.MoonLevel extends Milk.Level
 		@terrain.stage()
 		@skybox.stage()
 
+		@scene.add @milk
+		@scene.add @earth
+		@scene.add @sun
+
 		@player.stage()
 
 		@chat.stage()
 
 	update: (delta) ->
-		super
-
 		@chat.update delta
 
 		@player.update delta
@@ -55,6 +96,12 @@ class Milk.MoonLevel extends Milk.Level
 		@camera.lookAt @player.object3D.position
 		@pointLight.position = @player.object3D.position.clone()
 		@pointLight.position.y += 10
+
+		@earth.rotation.y += 0.01
+		@earth.rotation.x += 0.005
+		@earth.rotation.z += 0.005
+
+		super
 
 	heightAtPosition: (position) ->
 		@terrain.heightAtPosition position

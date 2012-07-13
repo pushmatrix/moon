@@ -171,46 +171,10 @@ class Scene
 		@players = {}
 		@vehicles = []
 
-		## MILK
-		geometry = new THREE.PlaneGeometry(256, 256, 1, 1)
-		material = new THREE.MeshPhongMaterial( ambient: 0xffffff, diffuse: 0xffffff, specular: 0xff9900, shininess: 64)
-		@milk = new THREE.Mesh(geometry, material)
-		@milk.doubleSided = true
-		@milk.position.y = 5
-		@add(@milk)
-
 		## TARDIS
 		tardis = new Vehicle.Tardis
 		tardis.position = new THREE.Vector3(-20,10.5,-60)
 		@addVehicle tardis
-
-		## EARTH
-		@earth = new THREE.Mesh(new THREE.SphereGeometry(50,20,20), new THREE.MeshLambertMaterial(map: THREE.ImageUtils.loadTexture("/public/earth.jpg"), color: 0xeeeeee))
-		@earth.position.z= 500
-		@earth.position.y= 79
-		@earth.rotation.y = 2.54
-		@add(@earth)
-
-		# SUN
-		textureFlare0 = THREE.ImageUtils.loadTexture( "/public/lensflare0.png" )
-		textureFlare2 = THREE.ImageUtils.loadTexture( "/public/lensflare2.png" )
-		textureFlare3 = THREE.ImageUtils.loadTexture( "/public/lensflare3.png" )
-
-		flareColor = new THREE.Color( 0xffffff )
-		THREE.ColorUtils.adjustHSV( flareColor, 0, -0.5, 0.5 )
-		@sun = new THREE.LensFlare( textureFlare0, 700, 0.0, THREE.AdditiveBlending, flareColor )
-		@sun.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending )
-		@sun.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending )
-		@sun.add( textureFlare2, 512, 0.0, THREE.AdditiveBlending )
-
-		@sun.add( textureFlare3, 60, 0.6, THREE.AdditiveBlending )
-		@sun.add( textureFlare3, 70, 0.7, THREE.AdditiveBlending )
-		@sun.add( textureFlare3, 120, 0.9, THREE.AdditiveBlending )
-		@sun.add( textureFlare3, 70, 1.0, THREE.AdditiveBlending )
-		@sun.position.x = 0
-		@sun.position.y = 30
-		@sun.position.z = -500
-		@scene.add(@sun)
 
 		@createRenderer()
 
@@ -263,24 +227,6 @@ class Scene
 
 		@player.update(delta)
 
-		mapHeightAtPlayer = @moon.getHeight(@player.position.x, @player.position.z)
-		magicNumber = @player.boundingBox.max.y
-		if mapHeightAtPlayer > @player.position.y - magicNumber
-			@player.position.y = mapHeightAtPlayer + magicNumber
-			@player.jumping = false
-
-		target = @player.position.clone().subSelf(@player.direction().multiplyScalar(-@player.followDistance))
-		@camera.position = @camera.position.addSelf(target.subSelf(@camera.position).multiplyScalar(0.1))
-
-		mapHeightAtCamera = @moon.getHeight(@camera.position.x, @camera.position.z)
-		if mapHeightAtCamera > (@player.position.y - 2)
-			@camera.position.y = mapHeightAtCamera + 2
-			@player.jumping = false
-
-		@camera.lookAt(@player.position)
-		@pointLight.position = @player.position.clone()
-		@pointLight.position.y += 10
-
 		if @player.position.y < (@milk.position.y - 3)
 			@scene.fog.far = 20
 		else
@@ -290,16 +236,6 @@ class Scene
 			vehicle.update() if vehicle isnt @player
 		for _,player of @players
 			player.afterUpdate()
-
-		@earth.rotation.y += 0.01
-		@earth.rotation.z += 0.005
-		@earth.rotation.x += 0.005
 		@renderer.render @scene, @camera
 
-
-$(document).ready ->
-	window.game = new Scene
-	window.client = new Client game
-	window.chat = new Chat
-	window.inventory = new Inventory
 ###
