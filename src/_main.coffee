@@ -92,6 +92,9 @@ class window.Milk
 class Milk.Component
 	@isMilkComponent: true
 
+class Milk.Script
+	@isMilkScript: true
+
 class Milk.Game extends Milk
 	constructor: ->
 		# can't call super before game is defined

@@ -27,6 +27,14 @@ class Milk.NetworkChat extends Milk
 		message = @input.value
 		return if not message
 
+		if message[0] is '/'
+			scriptName = message.substr(1)
+			if index = scriptName.indexOf(' ') isnt -1
+				scriptName = scriptName.substr(0, index - 1)
+
+			script = Milk.Script[scriptName]
+			return new script if script
+
 		data = {message: message}
 		@fire 'willSendMessage', data
 
