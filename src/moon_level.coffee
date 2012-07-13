@@ -67,6 +67,7 @@ class Milk.MoonLevel extends Milk.Level
 		player = @players[''+data.id]
 
 		if data.position
+			player.yVelocity = 0
 			player.object3D.position.x = data.position.x
 			player.object3D.position.y = data.position.y
 			player.object3D.position.z = data.position.z

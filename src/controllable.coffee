@@ -30,6 +30,8 @@ class Milk.Jumpable extends Milk.Component
 		if Milk.KeyHandler.isDown 'space'
 			@jump()
 			@queueUpdate?()
+		else if @jumping
+			@queueUpdate?()
 
 	jump: ->
 		if not @jumping
