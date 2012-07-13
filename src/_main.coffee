@@ -1,4 +1,4 @@
-window.disableEnvironment = true
+# window.disableEnvironment = true
 
 class window.Milk
 	@mixin: (target, objects...) ->
