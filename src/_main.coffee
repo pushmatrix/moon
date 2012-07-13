@@ -6,6 +6,9 @@ class window.Milk
 
 		target
 
+	mixin: (objects...) ->
+		Milk.mixin this, objects...
+
 	constructor: (components...) ->
 		@scene = game.scene
 
