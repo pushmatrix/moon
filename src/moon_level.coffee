@@ -7,6 +7,7 @@ class Milk.MoonLevel extends Milk.Level
 
 		@players = {}
 		@player = new Milk.Alien(
+			Milk.OverheadText
 			Milk.Animation
 			Milk.Movable
 			Milk.Controllable
@@ -17,6 +18,9 @@ class Milk.MoonLevel extends Milk.Level
 		game.client.observe 'removePlayer', @removePlayer
 		game.client.observe 'receivePlayerUpdate', @receivePlayerUpdate
 
+		@chat = new Milk.NetworkChat
+		game.client.observe 'receiveMessage', @receiveMessage
+
 	stage: ->
 		super
 
@@ -25,8 +29,12 @@ class Milk.MoonLevel extends Milk.Level
 
 		@player.stage()
 
+		@chat.stage()
+
 	update: (delta) ->
 		super
+
+		@chat.update delta
 
 		@player.update delta
 		for id, player of @players
@@ -48,7 +56,7 @@ class Milk.MoonLevel extends Milk.Level
 		@terrain.heightAtPosition position
 
 	addPlayer: (data) =>
-		player = new Milk.Spaceman Milk.Movable
+		player = new Milk.Spaceman Milk.Movable, Milk.OverheadText
 		player.afterReady =>
 			@players[''+data.id] = player
 
@@ -56,20 +64,41 @@ class Milk.MoonLevel extends Milk.Level
 			@receivePlayerUpdate data
 
 	removePlayer: (data) =>
-		player = @players[''+data.id]
+		player = @players[data.id]
 		@scene.remove player.object3D
 
-		@players[''+data.id] = null
-		delete @players[''+data.id]
+		@players[data.id] = null
+		delete @players[data.id]
 
 	receivePlayerUpdate: (data) =>
-		player = @players[''+data.id]
+		player = @players[data.id]
 
 		if data.position
 			player.yVelocity = 0
 			player.object3D.position.x = data.position.x
 			player.object3D.position.y = data.position.y
 			player.object3D.position.z = data.position.z
+
+	receiveMessage: (data) =>
+		return if not message = data.message
+
+		player = if data.self then @player else @players[data.id]
+		player.setText(message)
+		player.stageText()
+
+		if player.speechTimeout
+			clearTimeout player.speechTimeout
+			player.speechTimeout = null
+
+		if @currentSpeech
+			currentPlayer = @currentSpeech.player
+			currentMessage = @currentSpeech.message
+			currentPlayer.speechTimeout = setTimeout (-> currentPlayer.clearText(currentMessage)), 1000
+
+		@currentSpeech = {player: player, message: message}
+		speak.play message, {}, =>
+			@currentSpeech = null
+			player.clearText(message)
 
 class Milk.MoonTerrain extends Milk
 	constructor: ->

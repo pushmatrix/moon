@@ -1,4 +1,14 @@
-class Milk.Alien extends Milk
+# still haven't decided if this baseclass is worth anything at all
+class Milk.Actor extends Milk
+	stage: ->
+		super
+		@scene.add @object3D
+
+	update: (delta) ->
+		super
+		@object3D.update? delta
+
+class Milk.Alien extends Milk.Actor
 	constructor: ->
 		super
 		@notReady()
@@ -34,15 +44,11 @@ class Milk.Alien extends Milk
 	followDistance: 9
 	groundCollisionMinimum: 2
 
-	stage: ->
-		super
-		@scene.add @object3D
-
 	update: (delta) ->
 		super
 		@character.update delta
 
-class Milk.Spaceman extends Milk
+class Milk.Spaceman extends Milk.Actor
 	constructor: ->
 		super
 		@notReady()
@@ -52,10 +58,6 @@ class Milk.Spaceman extends Milk
 
 	followDistance: 8
 	groundCollisionMinimum: 0.8
-
-	stage: ->
-		super
-		@scene.add @object3D
 
 class Milk.Animation extends Milk.Component
 	setAnimation: (name, fps=6) ->

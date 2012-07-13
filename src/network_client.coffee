@@ -30,6 +30,10 @@ class Milk.NetworkClient extends Milk
 
 			@fire 'receivePlayerUpdate', player
 
+		now.receiveMessage = (data) =>
+			data.self = true if data.id is @id()
+			@fire 'receiveMessage', data
+
 	id: -> now.core.clientId
 
 	observe: (eventName, callback) ->
@@ -41,6 +45,7 @@ class Milk.NetworkClient extends Milk
 		if c
 			for callback in c
 				callback data
+		return this
 
 class Milk.Network extends Milk.Component
 	UPDATE_INTERVAL = 30

@@ -1,5 +1,5 @@
 class Milk.Controllable extends Milk.Component
-	exportObject: ->
+	stage: ->
 		Milk.KeyHandler.listen()
 
 	update: ->

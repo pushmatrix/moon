@@ -38,6 +38,9 @@ everyone.now.sendPlayerUpdate = (data) ->
 
   everyone.now.receivePlayerUpdate player
 
+everyone.now.sendMessage = (data) ->
+  everyone.now.receiveMessage id: @user.clientId, message: data.message
+
 ###
 everyone.now.sendUpdate = (player) ->
   players[@user.clientId] = player

@@ -1,5 +1,5 @@
 class Milk.KeyHandler extends Milk
-	KEY_MAP = {
+	@KEY_MAP = KEY_MAP = {
 		'up': 38
 		'down': 40
 		'left': 37
@@ -13,8 +13,8 @@ class Milk.KeyHandler extends Milk
 	@listen: ->
 		return if @downListener
 		@pressed = {}
-		@downListener = window.addEventListener 'keydown', (e) => @pressed[e.keyCode] = true
-		@upListener = window.addEventListener 'keyup', (e) => @pressed[e.keyCode] = false
+		@downListener = window.addEventListener 'keydown', (e) => @pressed[e.keyCode] = true; e.stopPropagation()
+		@upListener = window.addEventListener 'keyup', (e) => @pressed[e.keyCode] = false; e.stopPropagation()
 
 	@isDown: (keyName) ->
 		@pressed[KEY_MAP[keyName]]
