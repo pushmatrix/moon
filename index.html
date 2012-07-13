@@ -13,6 +13,17 @@
       overflow: hidden;
     }
 
+    #score {
+      position: absolute;
+      top: 25px;
+      right: 25px;
+      color: white;
+      text-shadow: 1px 1px 1px black;
+      font-family: Impact;
+      font-size: 24pt;
+      list-style: none;
+    }
+
     #chat {
       position: absolute;
       display: none;
@@ -114,6 +125,9 @@
 </head>
 
 <body>
+  <ul id="score">
+    <li>Milk Count: <span id="milk-count">0</span></li>
+  </ul>
   <ul id="inventory">
     <li><img data-item="milk" src="/public/milk.png"/></li>
     <li><img data-item="cookies" src="/public/cookies.png"/></li>

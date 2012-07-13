@@ -25,6 +25,8 @@ class Milk.NetworkChat extends Milk
 
 	sendMessage: ->
 		message = @input.value
+		return if not message
+
 		data = {message: message}
 		@fire 'willSendMessage', data
 

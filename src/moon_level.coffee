@@ -43,6 +43,7 @@ class Milk.MoonLevel extends Milk.Level
 			@sun.position.z = -500
 
 		## PLAYERS
+		@score = new Milk.Score
 		@players = {}
 		@player = new Milk.Alien(
 			Milk.OverheadText
@@ -79,6 +80,9 @@ class Milk.MoonLevel extends Milk.Level
 
 		game.client.enablePlayerUpdates()
 		@chat.stage()
+
+		@score.observe 'change:milk', (count) ->
+			document.getElementById('milk-count').innerHTML = count
 
 	update: (delta) ->
 		@chat.update delta
@@ -118,7 +122,6 @@ class Milk.MoonLevel extends Milk.Level
 			@receivePlayerUpdate data
 
 	removePlayer: (data) =>
-		console.log data, @players
 		player = @players[data.id]
 		@scene.remove player.object3D
 
@@ -130,6 +133,7 @@ class Milk.MoonLevel extends Milk.Level
 
 	receiveMessage: (data) =>
 		return if not message = data.message
+		@score.increase 'milk' if message.indexOf('milk') isnt -1
 
 		player = if data.self then @player else @players[data.id]
 		player.voice = data.voice if data.voice
