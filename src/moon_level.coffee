@@ -6,7 +6,7 @@ class Milk.MoonLevel extends Milk.Level
 		@terrain = new Milk.MoonTerrain
 		@skybox = new Milk.Skybox "public/skybox"
 
-		if not window.disableEnvironment
+		unless game.debug 'nocrash'
 			## MILK
 			geometry = new THREE.PlaneGeometry 256, 256, 1, 1
 			material = new THREE.MeshPhongMaterial ambient: 0xffffff, diffuse: 0xffffff, specular: 0xff9900, shininess: 64
@@ -71,7 +71,7 @@ class Milk.MoonLevel extends Milk.Level
 		@terrain.stage()
 		@skybox.stage()
 
-		if not window.disableEnvironment
+		unless game.debug 'nocrash'
 			@scene.add @milk
 			@scene.add @earth
 			@scene.add @sun
@@ -103,7 +103,7 @@ class Milk.MoonLevel extends Milk.Level
 		@pointLight.position = @player.object3D.position.clone()
 		@pointLight.position.y += 10
 
-		if not window.disableEnvironment
+		unless game.debug 'nocrash'
 			@earth.rotation.y += 0.01
 			@earth.rotation.x += 0.005
 			@earth.rotation.z += 0.005

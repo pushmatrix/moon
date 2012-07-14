@@ -1,5 +1,3 @@
-# window.disableEnvironment = true
-
 class window.Milk
 	@mixin: (target, objects...) ->
 		for object in objects
@@ -51,7 +49,7 @@ class window.Milk
 		Milk.loadingStates[className] += 1
 
 		console.log 'LOADING', className
-		l.append("<li>Loading #{className}</li>") if l = $('#chat-log')
+		l.innerHTML += "<li>Loading #{className}</li>" if l = document.getElementById('chat-log')
 
 	ready: ->
 		@_ready = true
@@ -60,8 +58,9 @@ class window.Milk
 
 		className = @constructor.name
 		Milk.loadingStates[className] -= 1
+
 		console.log 'DONE', className
-		l.append("<li>Done #{className}</li>") if l = $('#chat-log')
+		l.innerHTML += "<li>Done #{className}</li>" if l = document.getElementById('chat-log')
 
 		game.ready() if @isReady()
 
@@ -99,6 +98,10 @@ class Milk.Game extends Milk
 	constructor: ->
 		# can't call super before game is defined
 		@isReady = false
+		@debugOptions = window.location.hash.substr(1).split(',')
+
+	debug: (key) ->
+		@debugOptions.indexOf(key) isnt -1
 
 	loadLevel: (levelClass) ->
 		@client = new Milk.NetworkClient
@@ -109,7 +112,7 @@ class Milk.Game extends Milk
 	ready: ->
 		@hasLoaded = true
 		console.log 'DONE LOADING GAME'
-		setTimeout (-> $('#chat-log').html('')), 1500
+		setTimeout (-> document.getElementById('chat-log').innerHTML = ''), 1500
 		@stage()
 		@start()
 
@@ -163,7 +166,7 @@ class Milk.Game extends Milk
 		@level.update delta
 		@level.render @renderer
 
-$ ->
+window.addEventListener 'load', ->
 	window.game = new Milk.Game
 	game.loadLevel Milk.MoonLevel
 
