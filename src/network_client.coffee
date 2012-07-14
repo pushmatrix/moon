@@ -40,7 +40,8 @@ class Milk.NetworkClient extends Milk
 
 	id: -> now.core.clientId
 
-	enablePlayerUpdates: ->
+	stage: ->
+		super
 		@playerUpdateInterval = setInterval =>
 			return if not now.sendPlayerUpdate
 			data = {}
@@ -49,7 +50,7 @@ class Milk.NetworkClient extends Milk
 			now.sendPlayerUpdate data if not data.cancel
 		, Milk.NetworkClient.UPDATE_INTERVAL
 
-	disablePlayerUpdates: ->
+	unstage: ->
 		return if not @playerUpdateInterval
 		clearInterval @playerUpdateInterval
 		@playerUpdateInterval = null

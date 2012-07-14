@@ -78,7 +78,7 @@ class Milk.MoonLevel extends Milk.Level
 
 		@player.stage()
 
-		game.client.enablePlayerUpdates()
+		game.client.stage()
 		@chat.stage()
 
 		@score.observe 'change:milk', (count) ->
@@ -133,7 +133,10 @@ class Milk.MoonLevel extends Milk.Level
 
 	receiveMessage: (data) =>
 		return if not message = data.message
-		@score.increase 'milk' if message.indexOf('milk') isnt -1
+
+		if not data.countedMilk and data.message.indexOf('milk') isnt -1
+			@score.increase 'milk'
+			data.countedMilk = true
 
 		player = if data.self then @player else @players[data.id]
 		player.voice = data.voice if data.voice
