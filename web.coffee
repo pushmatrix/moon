@@ -23,7 +23,6 @@ nowjs.on 'connect', ->
   # Send this new player to all existing players
   everyone.now.addPlayer player
 
-
 nowjs.on 'disconnect', ->
   id = @user.clientId
   players[id] = null
@@ -42,6 +41,11 @@ everyone.now.sendPlayerUpdate = (data) ->
 everyone.now.sendMessage = (data) ->
   data.id = @user.clientId
   everyone.now.receiveMessage data
+
+everyone.now.changePlayerActor = (data) ->
+  data.id = @user.clientId
+  players[data.id].actorClass = data.actorClass
+  everyone.now.receiveChangePlayerActor data
 
 ###
 everyone.now.sendUpdate = (player) ->

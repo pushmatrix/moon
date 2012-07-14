@@ -15,7 +15,7 @@ class window.Milk
 		for component in components
 			if component?.isMilkComponent
 				@components ||= []
-				@components.push component
+				@components.push(component) if @components.indexOf(component) is -1
 
 				for key, value of component.prototype
 					if not @[key]?
@@ -35,9 +35,10 @@ class window.Milk
 		@componentDispatch 'render', args
 	update: (args...) ->
 		@componentDispatch 'update', args
-	exportObject: (object3D) ->
+	exportObject: (object3D, bounds) ->
 		@object3D = object3D
-		@componentDispatch 'exportObject', [object3D]
+		@bounds = bounds if bounds
+		@componentDispatch 'exportObject', [object3D, bounds]
 
 	notReady: ->
 		@_ready = false
@@ -53,7 +54,7 @@ class window.Milk
 
 	ready: ->
 		@_ready = true
-		@onready?()
+		@fire 'ready'
 		return if game.hasLoaded
 
 		className = @constructor.name
@@ -69,11 +70,7 @@ class window.Milk
 		for state, count of Milk.loadingStates
 			return false if count > 0
 
-		true
-
-	afterReady: (callback) ->
-		@onready = callback
-		@onready?() if @_ready
+		@_ready
 
 	observe: (eventName, callback) ->
 		@_observers ||= {}
@@ -82,7 +79,7 @@ class window.Milk
 		return this
 
 	fire: (eventName, data) ->
-		c = @_observers[eventName]
+		c = @_observers?[eventName]
 		if c
 			for callback in c
 				callback data
@@ -111,8 +108,10 @@ class Milk.Game extends Milk
 
 	ready: ->
 		@hasLoaded = true
+
 		console.log 'DONE LOADING GAME'
 		setTimeout (-> document.getElementById('chat-log').innerHTML = ''), 1500
+
 		@stage()
 		@start()
 
@@ -121,6 +120,12 @@ class Milk.Game extends Milk
 
 	antialias: true
 	stats: true
+
+	start: ->
+		@clock = new THREE.Clock
+		@constructRenderer()
+
+		requestAnimationFrame @render, @renderer.domElement
 
 	constructRenderer: ->
 		return if @renderer
@@ -149,12 +154,6 @@ class Milk.Game extends Milk
 			camera?.updateProjectionMatrix()
 
 		, false
-
-	start: ->
-		@clock = new THREE.Clock
-		@constructRenderer()
-
-		requestAnimationFrame @render, @renderer.domElement
 
 	render: (time) =>
 		delta = @clock.getDelta()

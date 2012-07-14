@@ -38,6 +38,10 @@ class Milk.NetworkClient extends Milk
 			data.self = true if data.id is @id()
 			@fire 'receiveMessage', data
 
+		now.receiveChangePlayerActor = (data) =>
+			return if data.id is @id()
+			@fire 'receiveChangePlayerActor', data
+
 	id: -> now.core.clientId
 
 	stage: ->

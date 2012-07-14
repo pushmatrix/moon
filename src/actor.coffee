@@ -4,6 +4,9 @@ class Milk.Actor extends Milk
 		super
 		@scene.add @object3D
 
+	unstage: ->
+		@scene.remove @object3D
+
 	update: (delta) ->
 		super
 		@object3D.update? delta
@@ -41,7 +44,11 @@ class Milk.Alien extends Milk.Actor
 		@character.scale = 0.08
 		@character.onLoadComplete = =>
 			@character.meshBody.rotation.y = 1.5
-			@exportObject @character.root
+
+			box = @character.meshBody.geometry.boundingBox.max
+			scale = @character.meshBody.scale
+			bounds = new THREE.Vector3().multiply(box, scale)
+			@exportObject @character.root, bounds
 
 			@ready()
 		@character.loadParts options
@@ -59,7 +66,7 @@ class Milk.Spaceman extends Milk.Actor
 		super
 		@notReady()
 		@sprite = new Milk.Sprite "public/robot.png", =>
-			@exportObject @sprite.object3D
+			@exportObject @sprite.object3D, @sprite.bounds
 			@ready()
 
 	followDistance: 8
@@ -117,12 +124,13 @@ class Milk.Movable extends Milk.Component
 			@jumping = true
 
 	update: ->
+		return if not @object3D
 		rotation = new THREE.Quaternion()
 		rotation.setFromAxisAngle(new THREE.Vector3(0,1,0), @angularVelocity)
 		@object3D.quaternion.multiplySelf(rotation)
 
 		@angularVelocity *= 0.9
-		@velocity *= 0.8
+		if @velocity < 0.001 and @velocity > 0.001 then @velocity = 0 else @velocity *= 0.8
 		@object3D.position.subSelf(@direction().multiplyScalar(@velocity))
 		@object3D.position.y += @yVelocity
 		@yVelocity -= 0.0005

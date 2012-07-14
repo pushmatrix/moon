@@ -45,17 +45,13 @@ class Milk.MoonLevel extends Milk.Level
 		## PLAYERS
 		@score = new Milk.Score
 		@players = {}
-		@player = new Milk.Alien(
-			Milk.OverheadText
-			Milk.Animation
-			Milk.Movable
-			Milk.Controllable
-		)
+		@player = @addPlayer controllable: true, id: 'player'
 
 		## NETWORK
 		game.client.observe 'addPlayer', @addPlayer
 		game.client.observe 'removePlayer', @removePlayer
 		game.client.observe 'receivePlayerUpdate', @receivePlayerUpdate
+		game.client.observe 'receiveChangePlayerActor', @receiveChangePlayerActor
 
 		## NETWORK CHAT
 		@chat = new Milk.NetworkChat
@@ -87,7 +83,6 @@ class Milk.MoonLevel extends Milk.Level
 	update: (delta) ->
 		@chat.update delta
 
-		@player.update delta
 		for id, player of @players
 			player.update delta
 
@@ -114,19 +109,38 @@ class Milk.MoonLevel extends Milk.Level
 		@terrain.heightAtPosition position
 
 	addPlayer: (data) =>
-		player = new Milk.Alien Milk.Movable, Milk.Animation, Milk.OverheadText
-		player.afterReady =>
-			@players[data.id] = player
+		components = [Milk.Movable, Milk.Animation, Milk.OverheadText]
+		components.push(Milk.Controllable) if data.controllable
 
+		data.actorClass = Milk[data.actorClass] if typeof data.actorClass is 'string'
+
+		player = new (data.actorClass || Milk.Spaceman) components...
+		@players[data.id] = player
+		ready = =>
 			player.stage()
-			@receivePlayerUpdate data
+			player.receiveNetworkUpdate(data)
+
+		if player.isReady() then ready() else player.observe('ready', ready)
+		return player
 
 	removePlayer: (data) =>
-		player = @players[data.id]
-		@scene.remove player.object3D
+		player = @players[data.id] || data
+		player.unstage()
 
 		@players[data.id] = null
 		delete @players[data.id]
+
+	replacePlayerActor: (player, actorClass, options={}) ->
+		options.actorClass = Milk[actorClass]
+		options.position = player.object3D.position
+		options.quaternion = player.object3D.quaternion
+
+		@removePlayer player
+		@addPlayer options
+
+	receiveChangePlayerActor: (data) =>
+		return if not player = @players[data.id]
+		@replacePlayerActor player, data.actorClass, data
 
 	receivePlayerUpdate: (data) =>
 		@players[data.id]?.receiveNetworkUpdate data

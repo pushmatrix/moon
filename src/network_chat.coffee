@@ -28,12 +28,9 @@ class Milk.NetworkChat extends Milk
 		return if not message
 
 		if message[0] is '/'
-			scriptName = message.substr(1)
-			if index = scriptName.indexOf(' ') isnt -1
-				scriptName = scriptName.substr(0, index - 1)
-
-			script = Milk.Script[scriptName]
-			return new script if script
+			params = message.substr(1).split(' ')
+			script = Milk.Script[params.shift()]
+			return new script(params...) if script
 
 		data = {message: message}
 		@fire 'willSendMessage', data

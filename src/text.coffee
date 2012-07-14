@@ -33,11 +33,11 @@ class Milk.Text extends Milk
 		geo.computeBoundingBox()
 		geo.computeVertexNormals()
 
-		@midX = geo.boundingBox.max.x * @scale / 2
-
 		mesh = new THREE.Mesh geo, @faceMaterial
 		mesh.scale = new THREE.Vector3 @scale, @scale, @scale
-		@exportObject mesh
+		bounds = new THREE.Vector3().multiply(geo.boundingBox.max, mesh.scale)
+
+		@exportObject mesh, bounds
 
 		@scene.add mesh
 
@@ -56,13 +56,13 @@ class Milk.OverheadText extends Milk.Component
 
 	update: ->
 		return if not @text
+
 		position = @text.object3D.position
-		position.x = @object3D.position.x
-		position.y = @object3D.position.y + 1.5
-		position.z = @object3D.position.z
+		position.copy @object3D.position
+		position.y += @bounds?.y || 1.5
 
 		@text.object3D.lookAt game.level.camera.position
-		@text.object3D.translateX -@text.midX
+		@text.object3D.translateX -(@text.bounds.x * 0.5)
 
 	clearText: (string) ->
 		return if !@text or (string? and @text?.value isnt string)
